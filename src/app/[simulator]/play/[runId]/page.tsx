@@ -46,9 +46,9 @@ export default async function PlayPage({
   return (
     <StoryShell config={config} run={run}>
       <SceneNarration scene={scene} />
+      <ChoiceList runId={run.id} scene={scene} />
       <RealmDrawer config={config} run={run} />
       <ChronicleDrawer run={run} />
-      <ChoiceList runId={run.id} scene={scene} />
       <CustomDecree runId={run.id} scene={scene} />
     </StoryShell>
   );
