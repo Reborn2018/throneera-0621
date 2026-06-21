@@ -92,13 +92,13 @@ describe("Creem adapter", () => {
           order: {
             id: "ord_123",
             product: "prod_123",
-            amount: 799,
+            amount: 999,
             currency: "USD",
             status: "paid",
           },
           product: {
             id: "prod_123",
-            price: 799,
+            price: 999,
             currency: "USD",
           },
         },
@@ -109,7 +109,7 @@ describe("Creem adapter", () => {
       providerCheckoutId: "ch_123",
       providerOrderId: "ord_123",
       providerProductId: "prod_123",
-      amountMinor: 799,
+      amountMinor: 999,
       currency: "USD",
     });
   });

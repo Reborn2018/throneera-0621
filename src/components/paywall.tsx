@@ -2,12 +2,16 @@ import { BrandHeader } from "@/components/brand-header";
 import type { RunRecord, SimulatorConfig } from "@/lib/types";
 
 export function Paywall({ config, run }: { config: SimulatorConfig; run: RunRecord }) {
+  const price = `$${(config.offer.amountMinor / 100).toFixed(2)}`;
+
   return (
     <main className={`page product-page ${config.themeClass}`}>
       <BrandHeader simulator={config.slug} />
       <section className="panel paywall">
         <p className="meta">Current campaign unlock</p>
-        <h1>{config.offer.label} - $7.99</h1>
+        <h1>
+          {config.offer.label} - {price}
+        </h1>
         <p className="copy">
           {run.identity.name}&apos;s reign is at the edge of its first real crisis. Continue
           this complete campaign with one secure purchase.

@@ -35,7 +35,7 @@ function makeOrder(id: string, runId: string): OrderRecord {
     id,
     runId,
     sku: "complete_current_campaign",
-    amountMinor: 799,
+    amountMinor: 999,
     currency: "USD",
     status: "pending",
     provider: "mock",

@@ -3,6 +3,8 @@ import { BrandHeader } from "@/components/brand-header";
 import type { SimulatorConfig } from "@/lib/types";
 
 export function LandingHero({ config }: { config: SimulatorConfig }) {
+  const price = `$${(config.offer.amountMinor / 100).toFixed(2)}`;
+
   return (
     <main className={`page product-page ${config.themeClass}`}>
       <BrandHeader simulator={config.slug} />
@@ -12,7 +14,7 @@ export function LandingHero({ config }: { config: SimulatorConfig }) {
         </div>
         <h1>{config.landing.headline}</h1>
         <p className="copy">{config.landing.subhead}</p>
-        <p className="conversion-line">Free start / $7.99 full campaign / no subscription</p>
+        <p className="conversion-line">Free start / {price} full campaign / no subscription</p>
         <div className="actions">
           <Link className="button" href={`/${config.slug}/start`}>
             {config.landing.cta}
