@@ -1,0 +1,10 @@
+.env
+.env.local
+.next/
+.throneera/
+.superpowers/
+.worktrees/
+node_modules/
+playwright-report/
+test-results/
+coverage/
