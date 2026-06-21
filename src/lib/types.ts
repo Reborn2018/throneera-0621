@@ -124,6 +124,7 @@ export interface OrderRecord {
   status: "pending" | "completed" | "refunded" | "disputed" | "failed" | "expired";
   provider: "mock" | "creem";
   providerCheckoutId: string;
+  providerCheckoutUrl?: string;
   providerOrderId?: string;
   providerProductId: string;
   requestId: string;

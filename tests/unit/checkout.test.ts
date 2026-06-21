@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { createMemoryStore } from "@/lib/adapters/local-store";
 import {
   applyCheckoutCompleted,
@@ -206,5 +206,59 @@ describe("checkout engine", () => {
         now: fixedNow,
       }),
     ).rejects.toThrow("Checkout provider is not configured");
+  });
+
+  it("creates and reuses a Creem checkout when mock checkout is disabled", async () => {
+    const store = await createPaywalledRun();
+    const createCheckout = vi.fn(async () => ({
+      providerCheckoutId: "ch_creem_1",
+      checkoutUrl: "https://checkout.creem.io/ch_creem_1",
+    }));
+
+    const first = await createCheckoutForRun({
+      store,
+      runId: "run-1",
+      requestId: "request-1",
+      providerProductId: productId,
+      allowMockCheckout: false,
+      siteUrl: "https://throneera.com",
+      checkoutProvider: {
+        provider: "creem",
+        createCheckout,
+      },
+      now: fixedNow,
+    });
+    const second = await createCheckoutForRun({
+      store,
+      runId: "run-1",
+      requestId: "request-2",
+      providerProductId: productId,
+      allowMockCheckout: false,
+      siteUrl: "https://throneera.com",
+      checkoutProvider: {
+        provider: "creem",
+        createCheckout,
+      },
+      now: fixedNow,
+    });
+
+    expect(createCheckout).toHaveBeenCalledTimes(1);
+    expect(createCheckout).toHaveBeenCalledWith({
+      productId,
+      requestId: "request-1",
+      successUrl: "https://throneera.com/queen/return?runId=run-1",
+      metadata: {
+        runId: "run-1",
+        simulator: "queen",
+        sku: "complete_current_campaign",
+      },
+    });
+    expect(first.order).toMatchObject({
+      provider: "creem",
+      providerCheckoutId: "ch_creem_1",
+      providerCheckoutUrl: "https://checkout.creem.io/ch_creem_1",
+    });
+    expect(second.order.id).toBe(first.order.id);
+    expect(second.checkoutUrl).toBe("https://checkout.creem.io/ch_creem_1");
   });
 });

@@ -1,37 +1,41 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
+import {
+  parseCreemWebhookEvent,
+  verifyCreemWebhookSignature,
+} from "@/lib/adapters/creem";
 import { applyCheckoutCompleted, applyRefundOrDispute } from "@/lib/engine/checkout";
 import { getStore } from "@/lib/server/store";
 
-const webhookSchema = z.discriminatedUnion("type", [
-  z.object({
-    type: z.literal("checkout.completed"),
-    providerEventId: z.string(),
-    providerCheckoutId: z.string(),
-    providerOrderId: z.string(),
-    providerProductId: z.string(),
-    amountMinor: z.number(),
-    currency: z.literal("USD"),
-  }),
-  z.object({
-    type: z.literal("checkout.refunded"),
-    providerEventId: z.string(),
-    providerOrderId: z.string(),
-  }),
-  z.object({
-    type: z.literal("checkout.disputed"),
-    providerEventId: z.string(),
-    providerOrderId: z.string(),
-  }),
-]);
-
 export async function POST(request: Request) {
-  const payload = webhookSchema.parse(await request.json());
+  const webhookSecret = process.env.CREEM_WEBHOOK_SECRET;
+  if (!webhookSecret) {
+    return NextResponse.json({ error: "Creem webhook is not configured" }, { status: 503 });
+  }
+
+  const rawBody = await request.text();
+  if (
+    !verifyCreemWebhookSignature(
+      rawBody,
+      request.headers.get("creem-signature"),
+      webhookSecret,
+    )
+  ) {
+    return NextResponse.json({ error: "Invalid Creem webhook signature" }, { status: 401 });
+  }
+
+  let payload: ReturnType<typeof parseCreemWebhookEvent>;
+  try {
+    payload = parseCreemWebhookEvent(JSON.parse(rawBody));
+  } catch {
+    return NextResponse.json({ error: "Invalid Creem webhook payload" }, { status: 400 });
+  }
+
   const store = await getStore();
 
   if (payload.type === "checkout.completed") {
     await applyCheckoutCompleted({
       store,
+      provider: "creem",
       providerEventId: payload.providerEventId,
       providerCheckoutId: payload.providerCheckoutId,
       providerOrderId: payload.providerOrderId,
@@ -42,6 +46,7 @@ export async function POST(request: Request) {
   } else {
     await applyRefundOrDispute({
       store,
+      provider: "creem",
       providerEventId: payload.providerEventId,
       providerOrderId: payload.providerOrderId,
       status: payload.type === "checkout.refunded" ? "refunded" : "disputed",
