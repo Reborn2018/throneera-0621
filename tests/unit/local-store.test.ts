@@ -10,6 +10,7 @@ function makeRun(id: string): RunRecord {
     simulator: "queen",
     status: "identity",
     currentSceneId: "identity",
+    runType: "first_campaign",
     identity: {
       name: "Isolde",
       dispositionId: "merciful",

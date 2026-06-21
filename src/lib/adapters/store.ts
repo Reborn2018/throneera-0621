@@ -1,6 +1,7 @@
 import type {
   EntitlementRecord,
   OrderRecord,
+  RestoreTokenRecord,
   RunEventRecord,
   RunRecord,
   SimulatorOffer,
@@ -20,6 +21,12 @@ export interface RunStore {
   saveEntitlement(entitlement: EntitlementRecord): Promise<void>;
   getActiveEntitlementForRun(runId: string): Promise<EntitlementRecord | null>;
   listEntitlementsForRun(runId: string): Promise<EntitlementRecord[]>;
+  saveRestoreToken(token: RestoreTokenRecord): Promise<void>;
+  getRestoreTokenByHash(tokenHash: string): Promise<RestoreTokenRecord | null>;
+  updateRestoreToken(
+    id: string,
+    update: (token: RestoreTokenRecord) => RestoreTokenRecord,
+  ): Promise<RestoreTokenRecord>;
   reset(): Promise<void>;
 }
 
@@ -28,4 +35,5 @@ export interface StoreSnapshot {
   events: RunEventRecord[];
   orders: OrderRecord[];
   entitlements: EntitlementRecord[];
+  restoreTokens: RestoreTokenRecord[];
 }

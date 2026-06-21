@@ -99,6 +99,8 @@ export interface RunRecord {
   simulator: SimulatorSlug;
   status: RunStatus;
   currentSceneId: string;
+  runType: "first_campaign" | "replay" | "cross_sell";
+  sourceRunId?: string;
   identity: {
     name: string;
     dispositionId: string;
@@ -144,5 +146,14 @@ export interface RunEventRecord {
   sceneId?: string;
   choiceId?: string;
   payload: Record<string, unknown>;
+  createdAt: string;
+}
+
+export interface RestoreTokenRecord {
+  id: string;
+  runId: string;
+  tokenHash: string;
+  expiresAt: string;
+  usedAt?: string;
   createdAt: string;
 }

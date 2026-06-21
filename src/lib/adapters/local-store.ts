@@ -4,6 +4,7 @@ import type { RunStore, StoreSnapshot } from "@/lib/adapters/store";
 import type {
   EntitlementRecord,
   OrderRecord,
+  RestoreTokenRecord,
   RunEventRecord,
   RunRecord,
   SimulatorOffer,
@@ -14,6 +15,7 @@ const emptySnapshot = (): StoreSnapshot => ({
   events: [],
   orders: [],
   entitlements: [],
+  restoreTokens: [],
 });
 
 function clone<T>(value: T): T {
@@ -130,6 +132,34 @@ class LocalStore implements RunStore {
     );
   }
 
+  async saveRestoreToken(token: RestoreTokenRecord): Promise<void> {
+    this.snapshot.restoreTokens = replaceById(this.snapshot.restoreTokens, clone(token));
+    await this.flush();
+  }
+
+  async getRestoreTokenByHash(tokenHash: string): Promise<RestoreTokenRecord | null> {
+    const token = this.snapshot.restoreTokens.find(
+      (candidate) => candidate.tokenHash === tokenHash,
+    );
+
+    return token ? clone(token) : null;
+  }
+
+  async updateRestoreToken(
+    id: string,
+    update: (token: RestoreTokenRecord) => RestoreTokenRecord,
+  ): Promise<RestoreTokenRecord> {
+    const token = this.snapshot.restoreTokens.find((candidate) => candidate.id === id);
+    if (!token) {
+      throw new Error(`Restore token not found: ${id}`);
+    }
+
+    const updated = clone(update(clone(token)));
+    this.snapshot.restoreTokens = replaceById(this.snapshot.restoreTokens, updated);
+    await this.flush();
+    return clone(updated);
+  }
+
   async reset(): Promise<void> {
     this.snapshot = emptySnapshot();
     await this.flush();
@@ -167,6 +197,7 @@ async function readSnapshot(filePath: string): Promise<StoreSnapshot> {
       events: parsed.events ?? [],
       orders: parsed.orders ?? [],
       entitlements: parsed.entitlements ?? [],
+      restoreTokens: parsed.restoreTokens ?? [],
     };
   } catch (error) {
     if (error instanceof Error && "code" in error && error.code === "ENOENT") {
