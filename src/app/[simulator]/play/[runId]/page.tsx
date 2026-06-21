@@ -1,7 +1,12 @@
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { ChoiceList } from "@/components/choice-list";
+import { ChronicleDrawer } from "@/components/chronicle-drawer";
+import { CustomDecree } from "@/components/custom-decree";
+import { RealmDrawer } from "@/components/realm-drawer";
+import { SceneNarration } from "@/components/scene-narration";
+import { StoryShell } from "@/components/story-shell";
 import { getCurrentScene } from "@/lib/engine/scenes";
-import { isSimulatorSlug } from "@/lib/simulators";
+import { getSimulatorConfig, isSimulatorSlug } from "@/lib/simulators";
 import { getStore } from "@/lib/server/store";
 
 export default async function PlayPage({
@@ -36,43 +41,15 @@ export default async function PlayPage({
   if (!scene) {
     notFound();
   }
+  const config = getSimulatorConfig(simulator);
 
   return (
-    <main className="page">
-      <section className="panel">
-        <div className="brand">ThroneEra</div>
-        <p className="meta">{scene.act}</p>
-        <h1>{scene.title}</h1>
-        {scene.narration.map((paragraph) => (
-          <p className="copy" key={paragraph}>
-            {paragraph}
-          </p>
-        ))}
-        {scene.dialogue ? (
-          <blockquote className="copy">
-            <strong>{scene.dialogue.speaker}:</strong> {scene.dialogue.text}
-          </blockquote>
-        ) : null}
-        {scene.letter ? (
-          <aside className="panel">
-            <p className="meta">{scene.letter.from}</p>
-            <p>{scene.letter.text}</p>
-          </aside>
-        ) : null}
-        <div className="choices">
-          {scene.choices.map((choice) => (
-            <form key={choice.id} method="post" action={`/api/runs/${run.id}/choice`}>
-              <input type="hidden" name="choiceId" value={choice.id} />
-              <button className="choice" type="submit">
-                {choice.label}
-              </button>
-            </form>
-          ))}
-        </div>
-        <Link className="muted" href={`/${simulator}`}>
-          Leave for now
-        </Link>
-      </section>
-    </main>
+    <StoryShell config={config} run={run}>
+      <SceneNarration scene={scene} />
+      <RealmDrawer config={config} run={run} />
+      <ChronicleDrawer run={run} />
+      <ChoiceList runId={run.id} scene={scene} />
+      <CustomDecree runId={run.id} scene={scene} />
+    </StoryShell>
   );
 }
