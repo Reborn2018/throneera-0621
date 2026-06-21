@@ -3,10 +3,8 @@ import {
   parseCreemWebhookEvent,
   verifyCreemWebhookSignature,
 } from "@/lib/adapters/creem";
-import { createMetaCapiClient } from "@/lib/adapters/meta-capi";
-import type { RunStore } from "@/lib/adapters/store";
 import { applyCheckoutCompleted, applyRefundOrDispute } from "@/lib/engine/checkout";
-import type { OrderRecord } from "@/lib/types";
+import { sendMetaPurchaseIfConfigured } from "@/lib/server/meta-purchase";
 import { getStore } from "@/lib/server/store";
 
 export async function POST(request: Request) {
@@ -46,7 +44,11 @@ export async function POST(request: Request) {
       amountMinor: payload.amountMinor,
       currency: payload.currency,
     });
-    await sendMetaPurchaseIfConfigured(order, store, new URL(request.url).origin);
+    await sendMetaPurchaseIfConfigured({
+      order,
+      store,
+      requestOrigin: new URL(request.url).origin,
+    });
   } else {
     await applyRefundOrDispute({
       store,
@@ -58,41 +60,4 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json({ ok: true });
-}
-
-async function sendMetaPurchaseIfConfigured(
-  order: OrderRecord,
-  store: RunStore,
-  requestOrigin: string,
-): Promise<void> {
-  const pixelId = process.env.META_PIXEL_ID;
-  const accessToken = process.env.META_ACCESS_TOKEN;
-  if (!pixelId || !accessToken) {
-    return;
-  }
-
-  const run = await store.getRun(order.runId);
-  if (!run) {
-    return;
-  }
-
-  const sourceUrl = new URL(
-    `/${run.simulator}/return`,
-    process.env.NEXT_PUBLIC_SITE_URL ?? requestOrigin,
-  );
-  sourceUrl.searchParams.set("runId", order.runId);
-
-  await createMetaCapiClient({
-    pixelId,
-    accessToken,
-    apiVersion: process.env.META_GRAPH_API_VERSION,
-  }).sendPurchase({
-    eventId: order.requestId,
-    sourceUrl: sourceUrl.toString(),
-    orderId: order.providerOrderId ?? order.id,
-    value: order.amountMinor / 100,
-    currency: order.currency,
-    sku: order.sku,
-    testEventCode: process.env.META_TEST_EVENT_CODE,
-  });
 }

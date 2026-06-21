@@ -1,6 +1,7 @@
 import { retrieveCreemCheckoutSession } from "@/lib/adapters/creem";
 import type { RunStore } from "@/lib/adapters/store";
 import { applyCheckoutCompleted } from "@/lib/engine/checkout";
+import { sendMetaPurchaseIfConfigured } from "@/lib/server/meta-purchase";
 import { getSimulatorConfig } from "@/lib/simulators";
 import type { RunRecord } from "@/lib/types";
 
@@ -10,6 +11,7 @@ interface CreemReturnOptions {
   apiKey?: string;
   apiBaseUrl?: string;
   fetchImpl?: typeof fetch;
+  requestOrigin?: string;
 }
 
 export async function syncCreemReturnEntitlement(
@@ -42,7 +44,7 @@ export async function syncCreemReturnEntitlement(
     return options.run;
   }
 
-  await applyCheckoutCompleted({
+  const completedOrder = await applyCheckoutCompleted({
     store: options.store,
     provider: "creem",
     providerEventId: `creem-return-${checkout.providerCheckoutId}-${checkout.providerOrderId}`,
@@ -52,6 +54,16 @@ export async function syncCreemReturnEntitlement(
     amountMinor: checkout.amountMinor,
     currency: checkout.currency,
   });
+
+  try {
+    await sendMetaPurchaseIfConfigured({
+      order: completedOrder,
+      store: options.store,
+      requestOrigin: options.requestOrigin,
+    });
+  } catch (error) {
+    console.error("Unable to send Meta Purchase for Creem return", error);
+  }
 
   return (await options.store.getRun(options.run.id)) ?? options.run;
 }
