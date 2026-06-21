@@ -42,11 +42,14 @@ NEXT_PUBLIC_SITE_URL=
 CREEM_API_KEY=
 CREEM_WEBHOOK_SECRET=
 CREEM_COMPLETE_CAMPAIGN_PRODUCT_ID=
+CREEM_API_BASE_URL=
 SUPABASE_URL=
 SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 META_PIXEL_ID=
 META_ACCESS_TOKEN=
+META_GRAPH_API_VERSION=v21.0
+META_TEST_EVENT_CODE=
 RESTORE_EMAIL_FROM=
 LLM_PROVIDER=
 LLM_API_KEY=
@@ -61,14 +64,24 @@ Production must not enable `THRONEERA_ALLOW_MOCK_CHECKOUT`.
 - Provider boundaries live in `src/lib/adapters`.
 - App Router pages live in `src/app`.
 - The local development store writes to `.throneera/local-store.json`.
+- Production storage uses Supabase when `SUPABASE_URL` and
+  `SUPABASE_SERVICE_ROLE_KEY` are configured.
 
 The base SKU is `complete_current_campaign` at `$7.99`, scoped to one run.
 Replay and cross-sell create new runs without carrying paid entitlement.
 
 ## Database
 
-The Supabase migration imported from the handoff package is in `db/001_initial.sql`.
-Review and apply it to the target Supabase project before production traffic.
+The Supabase migration is in `db/001_initial.sql`. It uses text IDs and nullable
+ownership fields so anonymous ad-test runs can be created before account login.
+Apply it to the target Supabase project before production traffic.
+
+## Payments And Analytics
+
+Production checkout uses Creem `POST /v1/checkouts`; successful purchases are
+granted only after `/api/webhooks/creem` verifies the raw-body
+`creem-signature`. Verified purchases also send a server-side Meta CAPI
+`Purchase` event with `event_id` set to the order request id.
 
 ## Deployment
 

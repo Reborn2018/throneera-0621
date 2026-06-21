@@ -11,6 +11,9 @@ access.
 - Server-owned run engine and local development store.
 - Run-scoped checkout entitlement semantics.
 - Mock checkout only when explicitly enabled outside production.
+- Supabase service-role store adapter and anonymous text-id production schema.
+- Creem checkout session adapter and raw-body webhook signature verification.
+- Meta CAPI server-side `Purchase` event sender from verified Creem checkout.
 - Unit tests for simulator config, local store, run engine, checkout idempotency,
   entitlement restore, replay requiring payment, mismatch rejection, and refund
   revocation.
@@ -19,12 +22,10 @@ access.
 ## Provider Gates Still Required
 
 - Apply `db/001_initial.sql` to a real Supabase project and review RLS.
-- Replace the local store with the Supabase adapter.
-- Configure Creem sandbox and production products.
-- Verify signed Creem webhook using the raw request body and provider secret.
-- Run a real Creem sandbox checkout and refund/dispute path.
-- Configure Meta Pixel and Conversions API.
-- Verify deduplicated `Purchase` in Meta Test Events.
+- Configure Creem production product and webhook endpoint.
+- Run a real Creem checkout and refund/dispute path.
+- Configure Vercel production environment variables.
+- Verify `Purchase` in Meta Test Events.
 - Configure restore email delivery.
 - Connect a production LLM adapter with timeout, validation, and fallback.
 - Configure production domain, HTTPS, CSP, logging, and alerts.
