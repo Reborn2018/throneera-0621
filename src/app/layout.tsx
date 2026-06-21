@@ -6,6 +6,7 @@ import {
   EB_Garamond,
   Spectral,
 } from "next/font/google";
+import { MetaPixel } from "@/components/meta-pixel";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -59,6 +60,7 @@ export default function RootLayout({
       <body
         className={`${cormorant.variable} ${ebGaramond.variable} ${cinzel.variable} ${spectral.variable} ${barlowCondensed.variable}`}
       >
+        <MetaPixel pixelId={process.env.META_PIXEL_ID} />
         {children}
       </body>
     </html>
