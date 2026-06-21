@@ -125,6 +125,7 @@ export interface OrderRecord {
   provider: "mock" | "creem";
   providerCheckoutId: string;
   providerOrderId?: string;
+  providerProductId: string;
   requestId: string;
   createdAt: string;
   updatedAt: string;
@@ -156,4 +157,13 @@ export interface RestoreTokenRecord {
   expiresAt: string;
   usedAt?: string;
   createdAt: string;
+}
+
+export interface WebhookEventRecord {
+  provider: "mock" | "creem";
+  providerEventId: string;
+  eventType: string;
+  payloadHash: string;
+  processedAt?: string;
+  receivedAt: string;
 }

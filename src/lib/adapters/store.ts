@@ -5,6 +5,7 @@ import type {
   RunEventRecord,
   RunRecord,
   SimulatorOffer,
+  WebhookEventRecord,
 } from "@/lib/types";
 
 export interface RunStore {
@@ -16,11 +17,19 @@ export interface RunStore {
   listRunEvents(runId: string): Promise<RunEventRecord[]>;
   saveOrder(order: OrderRecord): Promise<void>;
   getOrder(id: string): Promise<OrderRecord | null>;
+  findOrderByProviderCheckoutId(providerCheckoutId: string): Promise<OrderRecord | null>;
+  findOrderByProviderOrderId(providerOrderId: string): Promise<OrderRecord | null>;
   updateOrder(id: string, update: (order: OrderRecord) => OrderRecord): Promise<OrderRecord>;
   findOpenOrder(runId: string, sku: SimulatorOffer["sku"]): Promise<OrderRecord | null>;
   saveEntitlement(entitlement: EntitlementRecord): Promise<void>;
+  updateEntitlement(
+    id: string,
+    update: (entitlement: EntitlementRecord) => EntitlementRecord,
+  ): Promise<EntitlementRecord>;
   getActiveEntitlementForRun(runId: string): Promise<EntitlementRecord | null>;
   listEntitlementsForRun(runId: string): Promise<EntitlementRecord[]>;
+  saveWebhookEvent(event: WebhookEventRecord): Promise<void>;
+  getWebhookEvent(provider: WebhookEventRecord["provider"], providerEventId: string): Promise<WebhookEventRecord | null>;
   saveRestoreToken(token: RestoreTokenRecord): Promise<void>;
   getRestoreTokenByHash(tokenHash: string): Promise<RestoreTokenRecord | null>;
   updateRestoreToken(
@@ -35,5 +44,6 @@ export interface StoreSnapshot {
   events: RunEventRecord[];
   orders: OrderRecord[];
   entitlements: EntitlementRecord[];
+  webhookEvents: WebhookEventRecord[];
   restoreTokens: RestoreTokenRecord[];
 }

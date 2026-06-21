@@ -40,6 +40,7 @@ function makeOrder(id: string, runId: string): OrderRecord {
     status: "pending",
     provider: "mock",
     providerCheckoutId: `checkout-${id}`,
+    providerProductId: "prod_complete_current_campaign",
     requestId: `request-${id}`,
     createdAt: now,
     updatedAt: now,

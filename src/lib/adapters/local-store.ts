@@ -8,6 +8,7 @@ import type {
   RunEventRecord,
   RunRecord,
   SimulatorOffer,
+  WebhookEventRecord,
 } from "@/lib/types";
 
 const emptySnapshot = (): StoreSnapshot => ({
@@ -15,6 +16,7 @@ const emptySnapshot = (): StoreSnapshot => ({
   events: [],
   orders: [],
   entitlements: [],
+  webhookEvents: [],
   restoreTokens: [],
 });
 
@@ -84,6 +86,22 @@ class LocalStore implements RunStore {
     return order ? clone(order) : null;
   }
 
+  async findOrderByProviderCheckoutId(providerCheckoutId: string): Promise<OrderRecord | null> {
+    const order = this.snapshot.orders.find(
+      (candidate) => candidate.providerCheckoutId === providerCheckoutId,
+    );
+
+    return order ? clone(order) : null;
+  }
+
+  async findOrderByProviderOrderId(providerOrderId: string): Promise<OrderRecord | null> {
+    const order = this.snapshot.orders.find(
+      (candidate) => candidate.providerOrderId === providerOrderId,
+    );
+
+    return order ? clone(order) : null;
+  }
+
   async updateOrder(
     id: string,
     update: (order: OrderRecord) => OrderRecord,
@@ -118,6 +136,21 @@ class LocalStore implements RunStore {
     await this.flush();
   }
 
+  async updateEntitlement(
+    id: string,
+    update: (entitlement: EntitlementRecord) => EntitlementRecord,
+  ): Promise<EntitlementRecord> {
+    const entitlement = this.snapshot.entitlements.find((candidate) => candidate.id === id);
+    if (!entitlement) {
+      throw new Error(`Entitlement not found: ${id}`);
+    }
+
+    const updated = clone(update(clone(entitlement)));
+    this.snapshot.entitlements = replaceById(this.snapshot.entitlements, updated);
+    await this.flush();
+    return clone(updated);
+  }
+
   async getActiveEntitlementForRun(runId: string): Promise<EntitlementRecord | null> {
     const entitlement = this.snapshot.entitlements.find(
       (candidate) => candidate.runId === runId && candidate.status === "active",
@@ -130,6 +163,36 @@ class LocalStore implements RunStore {
     return clone(
       this.snapshot.entitlements.filter((entitlement) => entitlement.runId === runId),
     );
+  }
+
+  async saveWebhookEvent(event: WebhookEventRecord): Promise<void> {
+    const existingIndex = this.snapshot.webhookEvents.findIndex(
+      (candidate) =>
+        candidate.provider === event.provider &&
+        candidate.providerEventId === event.providerEventId,
+    );
+
+    if (existingIndex === -1) {
+      this.snapshot.webhookEvents = [...this.snapshot.webhookEvents, clone(event)];
+    } else {
+      const next = [...this.snapshot.webhookEvents];
+      next[existingIndex] = clone(event);
+      this.snapshot.webhookEvents = next;
+    }
+
+    await this.flush();
+  }
+
+  async getWebhookEvent(
+    provider: WebhookEventRecord["provider"],
+    providerEventId: string,
+  ): Promise<WebhookEventRecord | null> {
+    const event = this.snapshot.webhookEvents.find(
+      (candidate) =>
+        candidate.provider === provider && candidate.providerEventId === providerEventId,
+    );
+
+    return event ? clone(event) : null;
   }
 
   async saveRestoreToken(token: RestoreTokenRecord): Promise<void> {
@@ -197,6 +260,7 @@ async function readSnapshot(filePath: string): Promise<StoreSnapshot> {
       events: parsed.events ?? [],
       orders: parsed.orders ?? [],
       entitlements: parsed.entitlements ?? [],
+      webhookEvents: parsed.webhookEvents ?? [],
       restoreTokens: parsed.restoreTokens ?? [],
     };
   } catch (error) {
