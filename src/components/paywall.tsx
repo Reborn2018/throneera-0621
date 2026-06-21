@@ -17,15 +17,15 @@ export function Paywall({ config, run }: { config: SimulatorConfig; run: RunReco
           <li>Complete campaign and personalized ending</li>
           <li>Progress restores without another charge</li>
         </ul>
+        <p className="trust-line">Secure checkout. No subscription. Refund support available.</p>
         <form className="actions" method="post" action="/api/checkout">
           <input type="hidden" name="runId" value={run.id} />
           <button className="button" type="submit">
             Continue My Reign
           </button>
         </form>
-        <p className="muted">
-          No subscription. A new campaign or replay requires a separate payment or valid
-          campaign credit.
+        <p className="muted fine-print">
+          New campaigns and replays unlock separately.
         </p>
       </section>
     </main>

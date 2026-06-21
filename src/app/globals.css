@@ -81,6 +81,10 @@ textarea:focus-visible {
   font-size: 13px;
 }
 
+.brand-header nav a {
+  text-underline-offset: 3px;
+}
+
 .brand {
   color: var(--accent);
   font-family: var(--serif);
@@ -129,6 +133,25 @@ textarea:focus-visible {
   color: var(--muted);
   font-size: 18px;
   line-height: 1.65;
+}
+
+.conversion-line,
+.trust-line {
+  width: fit-content;
+  max-width: 100%;
+  margin: 0;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1.45;
+  text-transform: uppercase;
+}
+
+.trust-line {
+  color: var(--text);
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .panel {
@@ -193,16 +216,28 @@ textarea {
 }
 
 .radio-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 10px;
+  row-gap: 4px;
   padding: 13px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: rgba(255, 255, 255, 0.04);
+  text-align: left;
 }
 
 .radio-card input {
+  grid-row: 1 / span 2;
   width: auto;
   min-height: auto;
-  margin-right: 8px;
+  margin: 5px 0 0;
+}
+
+.radio-card strong,
+.radio-card span {
+  grid-column: 2;
+  text-align: left;
 }
 
 .radio-card span,
@@ -328,6 +363,11 @@ meter {
   color: var(--muted);
 }
 
+.fine-print {
+  font-size: 14px;
+  line-height: 1.45;
+}
+
 .meta {
   color: var(--accent);
   font-size: 12px;
@@ -362,12 +402,28 @@ meter {
   .brand-header {
     align-items: flex-start;
     flex-direction: column;
+    gap: 8px;
+  }
+
+  .brand-header nav {
+    gap: 10px;
+    font-size: 11px;
+    opacity: 0.72;
   }
 
   .hero h1,
   .panel h1,
   .panel h2 {
-    font-size: 42px;
+    font-size: 40px;
+  }
+
+  .copy {
+    font-size: 17px;
+  }
+
+  .conversion-line,
+  .trust-line {
+    font-size: 12px;
   }
 
   .meter-row {

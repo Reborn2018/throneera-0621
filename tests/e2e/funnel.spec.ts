@@ -38,7 +38,7 @@ test("Queen mobile free funnel reaches the current-run paywall", async ({ page }
 
   await expect(page).toHaveURL(/\/queen\/unlock\//);
   await expect(page.getByRole("heading", { name: /complete your reign/i })).toBeVisible();
-  await expect(page.getByText(/new campaign or replay requires a separate payment/i)).toBeVisible();
+  await expect(page.getByText(/new campaigns and replays unlock separately/i)).toBeVisible();
 });
 
 test("Napoleon mobile free funnel reaches the current-run paywall", async ({ page }) => {

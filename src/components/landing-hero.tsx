@@ -12,6 +12,7 @@ export function LandingHero({ config }: { config: SimulatorConfig }) {
         </div>
         <h1>{config.landing.headline}</h1>
         <p className="copy">{config.landing.subhead}</p>
+        <p className="conversion-line">Free start / $7.99 full campaign / no subscription</p>
         <div className="actions">
           <Link className="button" href={`/${config.slug}/start`}>
             {config.landing.cta}
