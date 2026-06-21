@@ -18,7 +18,7 @@ export async function POST(request: Request) {
       process.env.CREEM_COMPLETE_CAMPAIGN_PRODUCT_ID ?? "prod_complete_current_campaign",
     allowMockCheckout:
       process.env.THRONEERA_ALLOW_MOCK_CHECKOUT === "true" &&
-      process.env.NODE_ENV !== "production",
+      process.env.VERCEL_ENV !== "production",
   });
 
   if (wantsHtmlRedirect(request)) {

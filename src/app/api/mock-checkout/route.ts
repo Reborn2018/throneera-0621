@@ -5,7 +5,7 @@ import { getStore } from "@/lib/server/store";
 export async function GET(request: Request) {
   if (
     process.env.THRONEERA_ALLOW_MOCK_CHECKOUT !== "true" ||
-    process.env.NODE_ENV === "production"
+    process.env.VERCEL_ENV === "production"
   ) {
     return new Response("Mock checkout is disabled", { status: 404 });
   }
