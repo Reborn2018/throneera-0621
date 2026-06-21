@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { nanoid } from "nanoid";
 import type { CheckoutSession } from "@/lib/adapters/checkout";
 import { createMockCheckoutUrl } from "@/lib/adapters/checkout";
+import type { CreemCheckoutProvider } from "@/lib/adapters/creem";
 import type { RunStore } from "@/lib/adapters/store";
 import { getSimulatorConfig } from "@/lib/simulators";
 import type { OrderRecord, RunRecord } from "@/lib/types";
@@ -15,11 +16,14 @@ interface CheckoutOptions {
   requestId: string;
   providerProductId: string;
   allowMockCheckout: boolean;
+  siteUrl?: string;
+  checkoutProvider?: CreemCheckoutProvider;
   now?: Clock;
 }
 
 interface CompletedWebhookOptions {
   store: RunStore;
+  provider?: OrderRecord["provider"];
   providerEventId: string;
   providerCheckoutId: string;
   providerOrderId: string;
@@ -31,6 +35,7 @@ interface CompletedWebhookOptions {
 
 interface RefundWebhookOptions {
   store: RunStore;
+  provider?: OrderRecord["provider"];
   providerEventId: string;
   providerOrderId: string;
   status: "refunded" | "disputed";
@@ -43,10 +48,6 @@ interface EntitlementOptions {
 }
 
 export async function createCheckoutForRun(options: CheckoutOptions): Promise<CheckoutSession> {
-  if (!options.allowMockCheckout) {
-    throw new Error("Checkout provider is not configured");
-  }
-
   const run = await requireRun(options.store, options.runId);
   if (run.status !== "paywalled" && run.status !== "checkout_pending") {
     throw new Error(`Run is not ready for checkout: ${run.status}`);
@@ -57,11 +58,56 @@ export async function createCheckoutForRun(options: CheckoutOptions): Promise<Ch
   if (existing) {
     return {
       order: existing,
-      checkoutUrl: createMockCheckoutUrl(existing),
+      checkoutUrl: checkoutUrlForOrder(existing),
     };
   }
 
   const now = (options.now ?? defaultNow)().toISOString();
+  if (options.allowMockCheckout) {
+    const order: OrderRecord = {
+      id: `order-${nanoid()}`,
+      runId: run.id,
+      sku: offer.sku,
+      amountMinor: offer.amountMinor,
+      currency: offer.currency,
+      status: "pending",
+      provider: "mock",
+      providerCheckoutId: `mock-checkout-${nanoid()}`,
+      providerProductId: options.providerProductId,
+      requestId: options.requestId,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    await options.store.saveOrder(order);
+    await options.store.updateRun(run.id, (current) => ({
+      ...current,
+      status: "checkout_pending",
+      updatedAt: now,
+    }));
+
+    return {
+      order,
+      checkoutUrl: createMockCheckoutUrl(order),
+    };
+  }
+
+  if (!options.checkoutProvider || !options.siteUrl) {
+    throw new Error("Checkout provider is not configured");
+  }
+
+  const successUrl = new URL(`/${run.simulator}/return`, options.siteUrl);
+  successUrl.searchParams.set("runId", run.id);
+  const externalCheckout = await options.checkoutProvider.createCheckout({
+    productId: options.providerProductId,
+    requestId: options.requestId,
+    successUrl: successUrl.toString(),
+    metadata: {
+      runId: run.id,
+      simulator: run.simulator,
+      sku: offer.sku,
+    },
+  });
   const order: OrderRecord = {
     id: `order-${nanoid()}`,
     runId: run.id,
@@ -69,8 +115,9 @@ export async function createCheckoutForRun(options: CheckoutOptions): Promise<Ch
     amountMinor: offer.amountMinor,
     currency: offer.currency,
     status: "pending",
-    provider: "mock",
-    providerCheckoutId: `mock-checkout-${nanoid()}`,
+    provider: options.checkoutProvider.provider,
+    providerCheckoutId: externalCheckout.providerCheckoutId,
+    providerCheckoutUrl: externalCheckout.checkoutUrl,
     providerProductId: options.providerProductId,
     requestId: options.requestId,
     createdAt: now,
@@ -86,14 +133,15 @@ export async function createCheckoutForRun(options: CheckoutOptions): Promise<Ch
 
   return {
     order,
-    checkoutUrl: createMockCheckoutUrl(order),
+    checkoutUrl: externalCheckout.checkoutUrl,
   };
 }
 
 export async function applyCheckoutCompleted(
   options: CompletedWebhookOptions,
 ): Promise<OrderRecord> {
-  const existingEvent = await options.store.getWebhookEvent("mock", options.providerEventId);
+  const provider = options.provider ?? "mock";
+  const existingEvent = await options.store.getWebhookEvent(provider, options.providerEventId);
   if (existingEvent) {
     const order = await options.store.findOrderByProviderOrderId(options.providerOrderId);
     if (order) {
@@ -121,7 +169,7 @@ export async function applyCheckoutCompleted(
 
   const now = (options.now ?? defaultNow)().toISOString();
   await options.store.saveWebhookEvent({
-    provider: "mock",
+    provider,
     providerEventId: options.providerEventId,
     eventType: "checkout.completed",
     payloadHash: hashPayload(options),
@@ -159,7 +207,8 @@ export async function applyCheckoutCompleted(
 }
 
 export async function applyRefundOrDispute(options: RefundWebhookOptions): Promise<void> {
-  const existingEvent = await options.store.getWebhookEvent("mock", options.providerEventId);
+  const provider = options.provider ?? "mock";
+  const existingEvent = await options.store.getWebhookEvent(provider, options.providerEventId);
   if (existingEvent) {
     return;
   }
@@ -171,7 +220,7 @@ export async function applyRefundOrDispute(options: RefundWebhookOptions): Promi
 
   const now = (options.now ?? defaultNow)().toISOString();
   await options.store.saveWebhookEvent({
-    provider: "mock",
+    provider,
     providerEventId: options.providerEventId,
     eventType: `checkout.${options.status}`,
     payloadHash: hashPayload(options),
@@ -222,6 +271,18 @@ function assertCheckoutPayload(
 
 function hashPayload(payload: unknown): string {
   return createHash("sha256").update(JSON.stringify(payload)).digest("hex");
+}
+
+function checkoutUrlForOrder(order: OrderRecord): string {
+  if (order.provider === "mock") {
+    return createMockCheckoutUrl(order);
+  }
+
+  if (!order.providerCheckoutUrl) {
+    throw new Error(`Checkout URL missing for order: ${order.id}`);
+  }
+
+  return order.providerCheckoutUrl;
 }
 
 async function requireRun(store: RunStore, runId: string): Promise<RunRecord> {

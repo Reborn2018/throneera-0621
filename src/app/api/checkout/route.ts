@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { createCreemCheckoutProvider } from "@/lib/adapters/creem";
 import { createCheckoutForRun } from "@/lib/engine/checkout";
-import { readRequestData, redirectResponse, wantsHtmlRedirect } from "@/lib/server/request";
+import {
+  jsonError,
+  readRequestData,
+  redirectResponse,
+  wantsHtmlRedirect,
+} from "@/lib/server/request";
 import { getStore } from "@/lib/server/store";
 
 const checkoutSchema = z.object({
@@ -10,15 +16,30 @@ const checkoutSchema = z.object({
 
 export async function POST(request: Request) {
   const data = checkoutSchema.parse(await readRequestData(request));
+  const allowMockCheckout =
+    process.env.THRONEERA_ALLOW_MOCK_CHECKOUT === "true" &&
+    process.env.VERCEL_ENV !== "production";
+  const providerProductId = process.env.CREEM_COMPLETE_CAMPAIGN_PRODUCT_ID;
+  const creemApiKey = process.env.CREEM_API_KEY;
+
+  if (!allowMockCheckout && (!providerProductId || !creemApiKey)) {
+    return jsonError("Checkout provider is not configured", 503);
+  }
+
   const session = await createCheckoutForRun({
     store: await getStore(),
     runId: data.runId,
     requestId: crypto.randomUUID(),
-    providerProductId:
-      process.env.CREEM_COMPLETE_CAMPAIGN_PRODUCT_ID ?? "prod_complete_current_campaign",
-    allowMockCheckout:
-      process.env.THRONEERA_ALLOW_MOCK_CHECKOUT === "true" &&
-      process.env.VERCEL_ENV !== "production",
+    providerProductId: providerProductId ?? "prod_complete_current_campaign",
+    allowMockCheckout,
+    siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? new URL(request.url).origin,
+    checkoutProvider:
+      allowMockCheckout || !creemApiKey
+        ? undefined
+        : createCreemCheckoutProvider({
+            apiKey: creemApiKey,
+            apiBaseUrl: process.env.CREEM_API_BASE_URL,
+          }),
   });
 
   if (wantsHtmlRedirect(request)) {
