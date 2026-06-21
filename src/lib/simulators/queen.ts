@@ -5,10 +5,10 @@ export const queenConfig: SimulatorConfig = {
   title: "Queen Simulator",
   themeClass: "theme-queen",
   landing: {
-    headline: "Rule as a queen. Make impossible choices. Watch the kingdom remember.",
+    headline: "Queen Simulator",
     subhead:
-      "Begin free, claim the crown, and make the first command that will define your reign.",
-    cta: "Start Free",
+      "Start as a forgotten princess, claim the crown, and make impossible decrees that decide whether your realm loves you, fears you, or turns on you.",
+    cta: "Claim the Throne",
   },
   identity: {
     nameLabel: "Your queen's name",

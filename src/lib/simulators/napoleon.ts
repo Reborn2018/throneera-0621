@@ -5,10 +5,10 @@ export const napoleonConfig: SimulatorConfig = {
   title: "Napoleon Simulator",
   themeClass: "theme-napoleon",
   landing: {
-    headline: "Rise from command to legend. Decide what Europe will remember.",
+    headline: "Napoleon Simulator",
     subhead:
-      "Begin free, take the first impossible order, and watch ambition reshape the map.",
-    cta: "Begin Free",
+      "Take command of France, choose ambition or restraint, and find out whether Europe remembers you as savior, emperor, or disaster.",
+    cta: "Begin the Campaign",
   },
   identity: {
     nameLabel: "Your command name",

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { RunRecord, SimulatorConfig } from "@/lib/types";
 import { BrandHeader } from "@/components/brand-header";
+import { LegalLinks } from "@/components/legal-links";
 
 export function Ending({ config, run }: { config: SimulatorConfig; run: RunRecord }) {
   const title = config.endings.titles[0] ?? "A Reign Remembered";
@@ -33,6 +34,7 @@ export function Ending({ config, run }: { config: SimulatorConfig; run: RunRecor
           </Link>
         </div>
       </section>
+      <LegalLinks />
     </main>
   );
 }

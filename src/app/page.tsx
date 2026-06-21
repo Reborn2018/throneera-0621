@@ -1,5 +1,7 @@
-import { redirect } from "next/navigation";
+import { CampaignGateway } from "@/components/campaign-gateway";
+import { napoleonConfig } from "@/lib/simulators/napoleon";
+import { queenConfig } from "@/lib/simulators/queen";
 
 export default function HomePage() {
-  redirect("/queen");
+  return <CampaignGateway campaigns={[queenConfig, napoleonConfig]} />;
 }

@@ -3,10 +3,11 @@ import type { StoryScene } from "@/lib/types";
 export function SceneNarration({ scene }: { scene: StoryScene }) {
   return (
     <>
-      <p className="meta">{scene.act}</p>
-      <h1>{scene.title}</h1>
-      {scene.narration.map((paragraph) => (
-        <p className="copy" key={paragraph}>
+      <p className="scene-place">{scene.act}</p>
+      <h1 className="scene-title">{scene.title}</h1>
+      <div className="scene-rule" aria-hidden="true" />
+      {scene.narration.map((paragraph, index) => (
+        <p className={index === 0 ? "scene-text lead" : "scene-text"} key={paragraph}>
           {paragraph}
         </p>
       ))}
@@ -18,7 +19,7 @@ export function SceneNarration({ scene }: { scene: StoryScene }) {
       ) : null}
       {scene.letter ? (
         <aside className="letter">
-          <p className="meta">{scene.letter.from}</p>
+          <p className="eyebrow">{scene.letter.from}</p>
           <p>{scene.letter.text}</p>
         </aside>
       ) : null}

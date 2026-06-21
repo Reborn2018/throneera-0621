@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BrandHeader } from "@/components/brand-header";
+import { LegalLinks } from "@/components/legal-links";
 import type { RunRecord, SimulatorSlug } from "@/lib/types";
 
 export function ReturnCard({
@@ -29,6 +30,7 @@ export function ReturnCard({
           </Link>
         )}
       </section>
+      <LegalLinks />
     </main>
   );
 }

@@ -2,11 +2,15 @@ import { expect, test } from "@playwright/test";
 
 async function startRun(page: import("@playwright/test").Page, simulator: "queen" | "napoleon") {
   await page.goto(`/${simulator}`);
-  await page.getByRole("link", { name: /start free|begin free/i }).click();
+  await page
+    .getByRole("link", {
+      name: simulator === "queen" ? /claim the throne/i : /begin the campaign/i,
+    })
+    .click();
   const responsePromise = page.waitForResponse(
     (response) => response.url().includes("/api/runs") && response.status() < 400,
   );
-  await page.getByRole("button", { name: "Begin" }).click();
+  await page.getByRole("button", { name: /begin the first turn/i }).click();
   await responsePromise;
   await page.waitForLoadState("domcontentloaded");
   await expect(

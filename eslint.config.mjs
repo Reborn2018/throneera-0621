@@ -8,6 +8,7 @@ const eslintConfig = [
     ignores: [
       ".next/**",
       ".throneera/**",
+      "handoff/**",
       ".worktrees/**",
       "node_modules/**",
       "playwright-report/**",

@@ -16,8 +16,9 @@ export function CustomDecree({ runId, scene }: { runId: string; scene: StoryScen
       <form method="post" action={`/api/runs/${runId}/choice`}>
         <input type="hidden" name="choiceId" value={fallbackChoice.id} />
         <label>
-          <span className="meta">Court wording</span>
+          <span className="field-label">Court wording</span>
           <textarea
+            className="custom-area"
             name="decree"
             maxLength={180}
             placeholder="How will you deliver the order before the court?"
