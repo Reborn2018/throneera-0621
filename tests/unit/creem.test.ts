@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   createCreemCheckoutProvider,
   parseCreemWebhookEvent,
+  retrieveCreemCheckoutSession,
   verifyCreemRedirectSignature,
   verifyCreemWebhookSignature,
 } from "@/lib/adapters/creem";
@@ -79,6 +80,50 @@ describe("Creem adapter", () => {
     expect(
       verifyCreemRedirectSignature(`${rawWithoutSignature}&signature=bad`, "creem_live_key"),
     ).toBe(false);
+  });
+
+  it("retrieves checkout sessions with Creem's query parameter shape", async () => {
+    const fetchImpl = vi.fn(async (url: string | URL | Request, init?: RequestInit) => {
+      expect(String(url)).toBe("https://api.creem.io/v1/checkouts?checkout_id=ch_123");
+      expect(init?.headers).toMatchObject({
+        "x-api-key": "creem_live_key",
+      });
+
+      return new Response(
+        JSON.stringify({
+          id: "ch_123",
+          status: "completed",
+          product: "prod_123",
+          request_id: "order-request-1",
+          order: {
+            id: "ord_123",
+            product: "prod_123",
+            amount: 999,
+            currency: "USD",
+          },
+        }),
+        { status: 200 },
+      );
+    });
+
+    await expect(
+      retrieveCreemCheckoutSession(
+        {
+          apiKey: "creem_live_key",
+          apiBaseUrl: "https://api.creem.io/v1",
+          fetchImpl,
+        },
+        "ch_123",
+      ),
+    ).resolves.toEqual({
+      status: "completed",
+      providerCheckoutId: "ch_123",
+      providerOrderId: "ord_123",
+      providerProductId: "prod_123",
+      requestId: "order-request-1",
+      amountMinor: 999,
+      currency: "USD",
+    });
   });
 
   it("maps checkout.completed payloads to internal entitlement data", () => {

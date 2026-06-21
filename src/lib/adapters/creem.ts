@@ -12,6 +12,16 @@ export interface CreemCheckoutResult {
   checkoutUrl: string;
 }
 
+export interface NormalizedCreemCheckoutSession {
+  status: string;
+  providerCheckoutId: string;
+  providerOrderId: string;
+  providerProductId: string;
+  requestId: string;
+  amountMinor: number;
+  currency: string;
+}
+
 export interface CreemCheckoutProvider {
   provider: "creem";
   createCheckout(input: CreemCheckoutInput): Promise<CreemCheckoutResult>;
@@ -126,6 +136,44 @@ export function verifyCreemRedirectSignature(rawQuery: string, apiKey: string): 
     .digest("hex");
 
   return timingSafeHexEqual(expected, receivedSignature);
+}
+
+export async function retrieveCreemCheckoutSession(
+  options: CreemProviderOptions,
+  checkoutId: string,
+): Promise<NormalizedCreemCheckoutSession> {
+  const apiBaseUrl = (options.apiBaseUrl ?? "https://api.creem.io/v1").replace(/\/$/, "");
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const url = new URL(`${apiBaseUrl}/checkouts`);
+  url.searchParams.set("checkout_id", checkoutId);
+
+  const response = await fetchImpl(url, {
+    headers: {
+      "x-api-key": options.apiKey,
+    },
+  });
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`Creem checkout lookup failed with ${response.status}: ${body.slice(0, 200)}`);
+  }
+
+  return parseCreemCheckoutSession(await response.json());
+}
+
+export function parseCreemCheckoutSession(payload: unknown): NormalizedCreemCheckoutSession {
+  const checkout = asRecord(payload);
+  const order = readRecord(checkout, "order");
+
+  return {
+    status: readString(checkout, "status"),
+    providerCheckoutId: readString(checkout, "id"),
+    providerOrderId: readString(order, "id"),
+    providerProductId: readProductId(checkout, order),
+    requestId: readString(checkout, "request_id"),
+    amountMinor: readNumber(order, "amount"),
+    currency: readString(order, "currency"),
+  };
 }
 
 export function parseCreemWebhookEvent(payload: unknown): NormalizedCreemWebhookEvent {
