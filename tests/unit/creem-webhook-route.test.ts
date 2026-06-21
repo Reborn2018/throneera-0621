@@ -5,6 +5,8 @@ const mocks = vi.hoisted(() => ({
   getStore: vi.fn(),
   applyCheckoutCompleted: vi.fn(),
   applyRefundOrDispute: vi.fn(),
+  sendPurchase: vi.fn(),
+  createMetaCapiClient: vi.fn(),
 }));
 
 vi.mock("@/lib/server/store", () => ({
@@ -16,13 +18,33 @@ vi.mock("@/lib/engine/checkout", () => ({
   applyRefundOrDispute: mocks.applyRefundOrDispute,
 }));
 
+vi.mock("@/lib/adapters/meta-capi", () => ({
+  createMetaCapiClient: mocks.createMetaCapiClient,
+}));
+
 import { POST } from "@/app/api/webhooks/creem/route";
 
 describe("Creem webhook route", () => {
   beforeEach(() => {
     vi.resetAllMocks();
     process.env.CREEM_WEBHOOK_SECRET = "webhook_secret";
-    mocks.getStore.mockResolvedValue({ id: "store" });
+    process.env.NEXT_PUBLIC_SITE_URL = "https://throneera.com";
+    process.env.META_PIXEL_ID = "962233209997686";
+    process.env.META_ACCESS_TOKEN = "meta_access_token";
+    mocks.sendPurchase.mockResolvedValue({ eventsReceived: 1, messages: [] });
+    mocks.createMetaCapiClient.mockReturnValue({ sendPurchase: mocks.sendPurchase });
+    mocks.getStore.mockResolvedValue({
+      id: "store",
+      getRun: vi.fn(async () => ({ simulator: "queen" })),
+    });
+    mocks.applyCheckoutCompleted.mockResolvedValue({
+      runId: "run-1",
+      requestId: "order-request-1",
+      providerOrderId: "ord_123",
+      amountMinor: 799,
+      currency: "USD",
+      sku: "complete_current_campaign",
+    });
   });
 
   it("verifies the raw body signature before applying checkout completion", async () => {
@@ -54,7 +76,7 @@ describe("Creem webhook route", () => {
 
     expect(response.status).toBe(200);
     expect(mocks.applyCheckoutCompleted).toHaveBeenCalledWith({
-      store: { id: "store" },
+      store: expect.objectContaining({ id: "store" }),
       provider: "creem",
       providerEventId: "evt_123",
       providerCheckoutId: "ch_123",
@@ -62,6 +84,20 @@ describe("Creem webhook route", () => {
       providerProductId: "prod_123",
       amountMinor: 799,
       currency: "USD",
+    });
+    expect(mocks.createMetaCapiClient).toHaveBeenCalledWith({
+      pixelId: "962233209997686",
+      accessToken: "meta_access_token",
+      apiVersion: undefined,
+    });
+    expect(mocks.sendPurchase).toHaveBeenCalledWith({
+      eventId: "order-request-1",
+      sourceUrl: "https://throneera.com/queen/return?runId=run-1",
+      orderId: "ord_123",
+      value: 7.99,
+      currency: "USD",
+      sku: "complete_current_campaign",
+      testEventCode: undefined,
     });
   });
 
