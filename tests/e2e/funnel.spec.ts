@@ -171,6 +171,39 @@ test("mock checkout returns to the first paid Queen scene and refresh restores i
   await expect(page.getByRole("heading", { name: /war council/i })).toBeVisible();
 });
 
+test("completed Queen run invites a same-variant replay route", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await startRun(page, "queen", "crown");
+  await clickChoices(page, [
+    /kneel slowly/i,
+    /amnesty/i,
+    /address the crowd/i,
+    /borrow against/i,
+    /step over/i,
+  ]);
+
+  await page.getByRole("button", { name: /reclaim my crown/i }).click();
+  await expect(page).toHaveURL(/\/queen\/return\?runId=/);
+  await page.getByRole("link", { name: /resume the throne/i }).click();
+  await expect(page.getByRole("heading", { name: /trial of the crown/i })).toBeVisible();
+
+  await clickChoices(page, [
+    /summon the charter/i,
+    /open the gates/i,
+    /read the letter/i,
+    /safe passage/i,
+    /melt the coronation/i,
+    /royal law/i,
+  ]);
+
+  await expect(page).toHaveURL(/\/queen\/ending\/.*variant=crown/);
+  await expect(page.getByText(/fate sealed/i)).toBeVisible();
+  await expect(page.getByText(/next route can make your sister/i)).toBeVisible();
+  await page.getByRole("link", { name: /reclaim another crown/i }).click();
+  await expect(page).toHaveURL(/\/queen\/start\?.*variant=crown.*runType=replay/);
+  await expect(page.getByRole("button", { name: /begin a different route/i })).toBeVisible();
+});
+
 for (const viewport of [
   { width: 360, height: 800 },
   { width: 390, height: 844 },

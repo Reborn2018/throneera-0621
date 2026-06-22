@@ -52,6 +52,10 @@ export function ChoiceList({
     config.slug === "queen"
       ? "Your command is moving through the hall."
       : "Your command is moving across the map.";
+  const routeHint =
+    config.slug === "queen"
+      ? "This answer is now part of your route. Another command would bend the court toward a different fate."
+      : "This order is now part of your route. Another command would bend the campaign toward a different legacy.";
 
   return (
     <div className={`choices${hasImpact ? " choices-locked" : ""}`} aria-label="Choices">
@@ -90,6 +94,7 @@ export function ChoiceList({
             <span className="choice-impact-stamp">{impact.intent}</span>
             <p className="choice-impact-echo">{impact.label}</p>
             {impact.hint ? <p className="choice-impact-hint">{impact.hint}</p> : null}
+            <p className="choice-impact-route-hint">{routeHint}</p>
             <div className="choice-impact-path" aria-hidden="true">
               <span />
               <span />

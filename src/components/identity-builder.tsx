@@ -3,12 +3,22 @@ import { LegalLinks } from "@/components/legal-links";
 import type { SimulatorConfig } from "@/lib/types";
 import { getSimulatorVisuals } from "@/lib/simulators/presentation";
 
-export function IdentityBuilder({ config }: { config: SimulatorConfig }) {
+export function IdentityBuilder({
+  config,
+  replaySourceRunId,
+}: {
+  config: SimulatorConfig;
+  replaySourceRunId?: string;
+}) {
   const visuals = getSimulatorVisuals(config);
   const noun = config.slug === "queen" ? "crown" : "command";
-  const introHeading = config.identityIntro?.heading ?? `Claim your ${noun} before history claims you.`;
-  const introCopy =
-    config.identityIntro?.copy ??
+  const isReplay = Boolean(replaySourceRunId);
+  const introHeading = isReplay
+    ? `Choose the ${noun} that changes this fate.`
+    : config.identityIntro?.heading ?? `Claim your ${noun} before history claims you.`;
+  const introCopy = isReplay
+    ? "The crisis remembers your last path. Change the posture, origin, and first command to open a different route through the same throne."
+    : config.identityIntro?.copy ??
     "Your first identity choices shape how the court, army, and public read every command that follows.";
 
   return (
@@ -22,6 +32,12 @@ export function IdentityBuilder({ config }: { config: SimulatorConfig }) {
           <input type="hidden" name="simulator" value={config.slug} />
           {config.slug === "queen" ? (
             <input type="hidden" name="variantId" value={config.variantId ?? "legacy"} />
+          ) : null}
+          {replaySourceRunId ? (
+            <>
+              <input type="hidden" name="sourceRunId" value={replaySourceRunId} />
+              <input type="hidden" name="runType" value="replay" />
+            </>
           ) : null}
           <label className="field-stack">
             <span className="field-label">{config.identity.nameLabel}</span>
@@ -73,7 +89,7 @@ export function IdentityBuilder({ config }: { config: SimulatorConfig }) {
             </div>
           </fieldset>
           <button className="button" type="submit">
-            Begin the First Turn
+            {isReplay ? "Begin a Different Route" : "Begin the First Turn"}
           </button>
         </form>
       </section>

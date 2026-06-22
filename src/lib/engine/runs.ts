@@ -197,7 +197,7 @@ export async function createReplayRun(options: CreateReplayOptions): Promise<Run
     throw new Error("Replay requires a completed source run");
   }
 
-  return createRun({
+  const replay = await createRun({
     store: options.store,
     simulator: sourceRun.simulator,
     runId: options.runId,
@@ -207,6 +207,19 @@ export async function createReplayRun(options: CreateReplayOptions): Promise<Run
       sourceRun.simulator === "queen" ? normalizeQueenVariant(sourceRun.identity.variantId) : undefined,
     now: options.now,
   });
+
+  await appendRunFunnelEvent(options.store, sourceRun, "replay_started", {
+    replay_run_id: replay.id,
+    replay_variant_id: getRunVariantId(replay),
+    source_run_type: sourceRun.runType,
+  });
+  await appendRunFunnelEvent(options.store, replay, "replay_created", {
+    source_run_id: sourceRun.id,
+    source_variant_id: getRunVariantId(sourceRun),
+    source_run_type: sourceRun.runType,
+  });
+
+  return replay;
 }
 
 export async function createRestoreToken(options: CreateRestoreTokenOptions): Promise<string> {

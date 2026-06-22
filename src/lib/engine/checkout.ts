@@ -234,6 +234,17 @@ export async function applyCheckoutCompleted(
       currency: completedOrder.currency,
       sku: completedOrder.sku,
     });
+    if (updatedRun.runType === "replay") {
+      await appendRunFunnelEvent(options.store, updatedRun, "replay_purchase", {
+        source_run_id: updatedRun.sourceRunId ?? "",
+        order_id: completedOrder.id,
+        provider: completedOrder.provider,
+        provider_order_id: completedOrder.providerOrderId ?? "",
+        amount_minor: completedOrder.amountMinor,
+        currency: completedOrder.currency,
+        sku: completedOrder.sku,
+      });
+    }
     await appendRunFunnelEvent(options.store, updatedRun, "paid_content_started", {
       scene_id: firstPaidScene.id,
       order_id: completedOrder.id,

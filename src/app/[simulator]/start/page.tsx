@@ -8,15 +8,20 @@ export default async function StartPage({
   searchParams,
 }: {
   params: Promise<{ simulator: string }>;
-  searchParams: Promise<{ variant?: string }>;
+  searchParams: Promise<{ sourceRunId?: string; runType?: string; variant?: string }>;
 }) {
   const { simulator } = await params;
-  const { variant } = await searchParams;
+  const { sourceRunId, runType, variant } = await searchParams;
   if (!isSimulatorSlug(simulator)) {
     notFound();
   }
 
   const config = getSimulatorConfig(simulator, getConfigVariantForSimulator(simulator, variant));
 
-  return <IdentityBuilder config={config} />;
+  return (
+    <IdentityBuilder
+      config={config}
+      replaySourceRunId={runType === "replay" ? sourceRunId : undefined}
+    />
+  );
 }

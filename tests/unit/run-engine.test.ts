@@ -170,6 +170,31 @@ describe("run engine", () => {
       runType: "replay",
       sourceRunId: "run-1",
     });
+
+    await expect(store.listRunEvents("run-1")).resolves.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          eventType: "replay_started",
+          payload: expect.objectContaining({
+            replay_run_id: "run-2",
+            replay_variant_id: "legacy",
+            source_run_type: "first_campaign",
+          }),
+        }),
+      ]),
+    );
+    await expect(store.listRunEvents("run-2")).resolves.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          eventType: "replay_created",
+          payload: expect.objectContaining({
+            source_run_id: "run-1",
+            run_type: "replay",
+            variant_id: "legacy",
+          }),
+        }),
+      ]),
+    );
   });
 
   it("restores a run from an unexpired one-time token", async () => {

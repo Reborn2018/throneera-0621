@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { createRun, submitIdentity } from "@/lib/engine/runs";
+import { createReplayRun, createRun, submitIdentity } from "@/lib/engine/runs";
 import { isSimulatorSlug } from "@/lib/simulators";
 import { readRequestData, redirectResponse, wantsHtmlRedirect } from "@/lib/server/request";
 import { getStore } from "@/lib/server/store";
@@ -12,6 +12,7 @@ const runSchema = z.object({
   dispositionId: z.string().optional(),
   originId: z.string().optional(),
   sourceRunId: z.string().optional(),
+  runType: z.enum(["first_campaign", "replay", "cross_sell"]).optional(),
   variantId: z.string().optional(),
 });
 
@@ -23,13 +24,23 @@ export async function POST(request: Request) {
 
   const store = await getStore();
   const variantId = getConfigVariantForSimulator(data.simulator, data.variantId);
-  const run = await createRun({
-    store,
-    simulator: data.simulator,
-    runType: data.sourceRunId ? "cross_sell" : "first_campaign",
-    sourceRunId: data.sourceRunId,
-    variantId: data.simulator === "queen" ? variantId : undefined,
-  });
+  if (data.runType === "replay" && !data.sourceRunId) {
+    return NextResponse.json({ error: "Replay requires a source run" }, { status: 400 });
+  }
+
+  const run =
+    data.runType === "replay" && data.sourceRunId
+      ? await createReplayRun({
+          store,
+          sourceRunId: data.sourceRunId,
+        })
+      : await createRun({
+          store,
+          simulator: data.simulator,
+          runType: data.runType ?? (data.sourceRunId ? "cross_sell" : "first_campaign"),
+          sourceRunId: data.sourceRunId,
+          variantId: data.simulator === "queen" ? variantId : undefined,
+        });
 
   const withIdentity =
     data.name && data.dispositionId && data.originId

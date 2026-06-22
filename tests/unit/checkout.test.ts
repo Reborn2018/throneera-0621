@@ -192,6 +192,55 @@ describe("checkout engine", () => {
     expect(await hasActiveRunEntitlement({ store, runId: "run-2" })).toBe(false);
   });
 
+  it("records replay purchases as a separate LTV event", async () => {
+    const store = createMemoryStore();
+    await createRun({ store, simulator: "queen", runId: "run-1", now: fixedNow });
+    await store.updateRun("run-1", (run) => ({
+      ...run,
+      status: "completed",
+      completedAt: fixedNow().toISOString(),
+    }));
+    await createReplayRun({ store, sourceRunId: "run-1", runId: "run-2", now: fixedNow });
+    await store.updateRun("run-2", (run) => ({
+      ...run,
+      status: "paywalled",
+      currentSceneId: "crown-in-peril",
+    }));
+    const checkout = await createCheckoutForRun({
+      store,
+      runId: "run-2",
+      requestId: "request-2",
+      providerProductId: productId,
+      allowMockCheckout: true,
+      now: fixedNow,
+    });
+
+    await applyCheckoutCompleted({
+      store,
+      providerEventId: "event-2",
+      providerCheckoutId: checkout.order.providerCheckoutId,
+      providerOrderId: "provider-order-2",
+      providerProductId: productId,
+      amountMinor: 799,
+      currency: "USD",
+      now: fixedNow,
+    });
+
+    await expect(store.listRunEvents("run-2")).resolves.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          eventType: "replay_purchase",
+          payload: expect.objectContaining({
+            run_type: "replay",
+            source_run_id: "run-1",
+            order_id: checkout.order.id,
+            amount_minor: 799,
+          }),
+        }),
+      ]),
+    );
+  });
+
   it("revokes only the originating run entitlement for refunds", async () => {
     const store = await createPaywalledRun();
     const checkout = await createCheckoutForRun({
