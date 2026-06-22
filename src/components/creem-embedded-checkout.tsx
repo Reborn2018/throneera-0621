@@ -158,7 +158,7 @@ export function CreemEmbeddedCheckout({
           {isPending ? "Opening Secure Checkout..." : enabled && !isHydrated ? "Preparing Secure Checkout..." : label}
         </button>
       </form>
-      {enabled && checkoutUrl ? (
+      {enabled && (checkoutUrl || isCheckoutVisible) ? (
         <div
           className={`creem-checkout-overlay${isCheckoutVisible ? " is-visible" : ""}`}
           role="dialog"
@@ -171,19 +171,21 @@ export function CreemEmbeddedCheckout({
               <span aria-hidden="true">x</span>
             </button>
             <div className="creem-checkout-frame-shell">
-              <CreemCheckoutInline
-                checkoutUrl={checkoutUrl}
-                theme="dark"
-                className="creem-checkout-inline"
-                style={{ width: "100%", height: "100%" }}
-                onReady={() => {
-                  checkoutReadyRef.current = true;
-                  setIsCheckoutReady(true);
-                  setIsPending(false);
-                }}
-                onComplete={completeCheckout}
-              />
-              {!isCheckoutReady ? (
+              {checkoutUrl ? (
+                <CreemCheckoutInline
+                  checkoutUrl={checkoutUrl}
+                  theme="dark"
+                  className="creem-checkout-inline"
+                  style={{ width: "100%", height: "100%" }}
+                  onReady={() => {
+                    checkoutReadyRef.current = true;
+                    setIsCheckoutReady(true);
+                    setIsPending(false);
+                  }}
+                  onComplete={completeCheckout}
+                />
+              ) : null}
+              {!checkoutUrl || !isCheckoutReady ? (
                 <div className="creem-checkout-loading" role="status">
                   Opening secure checkout...
                 </div>
