@@ -23,6 +23,7 @@ export function CreemEmbeddedCheckout({
   const openCheckout = useCreemCheckout();
   const checkoutUrlRef = useRef<string | null>(null);
   const prefetchPromiseRef = useRef<Promise<string | null> | null>(null);
+  const [isHydrated, setIsHydrated] = useState(false);
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -52,6 +53,14 @@ export function CreemEmbeddedCheckout({
     },
     [runId],
   );
+
+  useEffect(() => {
+    const hydrateTimer = window.setTimeout(() => setIsHydrated(true), 0);
+
+    return () => {
+      window.clearTimeout(hydrateTimer);
+    };
+  }, []);
 
   useEffect(() => {
     if (!enabled || checkoutUrlRef.current || prefetchPromiseRef.current) {
@@ -125,8 +134,8 @@ export function CreemEmbeddedCheckout({
     <>
       <form ref={formRef} className="actions" method="post" action="/api/checkout" onSubmit={onSubmit}>
         <input type="hidden" name="runId" value={runId} />
-        <button className="button" type="submit" aria-busy={isPending} disabled={isPending}>
-          {isPending ? "Opening Secure Checkout..." : label}
+        <button className="button" type="submit" aria-busy={isPending} disabled={enabled ? !isHydrated || isPending : false}>
+          {isPending ? "Opening Secure Checkout..." : enabled && !isHydrated ? "Preparing Secure Checkout..." : label}
         </button>
       </form>
       {error ? (
