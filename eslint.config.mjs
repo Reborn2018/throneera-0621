@@ -9,6 +9,7 @@ const eslintConfig = [
       ".next/**",
       ".throneera/**",
       "handoff/**",
+      "*claude_design/**",
       ".worktrees/**",
       "node_modules/**",
       "playwright-report/**",
