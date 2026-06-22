@@ -59,12 +59,9 @@ export function CreemEmbeddedCheckout({
     }
 
     const controller = new AbortController();
-    const timer = window.setTimeout(() => {
-      prefetchPromiseRef.current = requestCheckout("prefetch", controller.signal).catch(() => null);
-    }, 700);
+    prefetchPromiseRef.current = requestCheckout("prefetch", controller.signal).catch(() => null);
 
     return () => {
-      window.clearTimeout(timer);
       controller.abort();
     };
   }, [enabled, requestCheckout]);
