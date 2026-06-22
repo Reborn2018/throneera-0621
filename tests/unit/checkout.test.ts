@@ -65,7 +65,7 @@ describe("checkout engine", () => {
       providerCheckoutId: checkout.order.providerCheckoutId,
       providerOrderId: "provider-order-1",
       providerProductId: productId,
-      amountMinor: 999,
+      amountMinor: 799,
       currency: "USD",
       now: fixedNow,
     });
@@ -96,7 +96,7 @@ describe("checkout engine", () => {
         providerCheckoutId: checkout.order.providerCheckoutId,
         providerOrderId: "provider-order-1",
         providerProductId: productId,
-        amountMinor: 999,
+        amountMinor: 799,
         currency: "USD",
         now: fixedNow,
       });
@@ -106,9 +106,9 @@ describe("checkout engine", () => {
   });
 
   it.each([
-    { providerProductId: "wrong-product", amountMinor: 999, currency: "USD" as const },
+    { providerProductId: "wrong-product", amountMinor: 799, currency: "USD" as const },
     { providerProductId: productId, amountMinor: 800, currency: "USD" as const },
-    { providerProductId: productId, amountMinor: 999, currency: "EUR" as const },
+    { providerProductId: productId, amountMinor: 799, currency: "EUR" as const },
   ])("rejects checkout mismatch %#", async (payload) => {
     const store = await createPaywalledRun();
     const checkout = await createCheckoutForRun({
@@ -148,7 +148,7 @@ describe("checkout engine", () => {
       providerCheckoutId: checkout.order.providerCheckoutId,
       providerOrderId: "provider-order-1",
       providerProductId: productId,
-      amountMinor: 999,
+      amountMinor: 799,
       currency: "USD",
       now: fixedNow,
     });
@@ -176,7 +176,7 @@ describe("checkout engine", () => {
       providerCheckoutId: checkout.order.providerCheckoutId,
       providerOrderId: "provider-order-1",
       providerProductId: productId,
-      amountMinor: 999,
+      amountMinor: 799,
       currency: "USD",
       now: fixedNow,
     });

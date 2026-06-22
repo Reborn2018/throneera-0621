@@ -73,7 +73,7 @@ describe("Creem return sync", () => {
         order: {
           id: "ord_123",
           product: productId,
-          amount: 999,
+          amount: 799,
           currency: "USD",
         },
       }),
@@ -110,7 +110,7 @@ describe("Creem return sync", () => {
         order: {
           id: "ord_123",
           product: productId,
-          amount: 999,
+          amount: 799,
           currency: "USD",
         },
       }),
@@ -134,7 +134,7 @@ describe("Creem return sync", () => {
       eventId: "request-1",
       sourceUrl: "https://throneera.com/queen/return?runId=run-1&variant=legacy",
       orderId: "ord_123",
-      value: 9.99,
+      value: 7.99,
       currency: "USD",
       sku: "complete_current_campaign",
       variantId: "legacy",
@@ -154,7 +154,7 @@ describe("Creem return sync", () => {
         order: {
           id: "ord_123",
           product: productId,
-          amount: 999,
+          amount: 799,
           currency: "USD",
         },
       }),

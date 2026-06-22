@@ -19,6 +19,7 @@ export function Paywall({ config, run }: { config: SimulatorConfig; run: RunReco
       : "Europe is moving before dawn. Paris is waiting to see whether you are useful, dangerous, or inevitable.");
   const loss = config.paywall?.loss ?? "Leave now and this crisis remains unresolved.";
   const cta = config.paywall?.cta ?? `Continue My ${config.slug === "queen" ? "Reign" : "Campaign"}`;
+  const endingNoun = config.slug === "queen" ? "ending" : "finale";
   const variantSearch = variantSearchForConfig(config);
   const embeddedCheckoutEnabled =
     process.env.VERCEL_ENV === "production" &&
@@ -38,13 +39,27 @@ export function Paywall({ config, run }: { config: SimulatorConfig; run: RunReco
         <p className="pw-loss">{loss}</p>
         <h1>{config.offer.label}</h1>
         <p className="copy">
-          Unlock the remaining {paidTurns} turns, carry your current choices forward,
-          and reach one of {config.endings.totalSlots} personalized endings for{" "}
-          {run.identity.name}.
+          Finish this crisis from your exact save, carry every choice forward,
+          and reveal the personalized {endingNoun} your reign has earned.
         </p>
+        <div className="pw-value-strip" aria-label="What this unlock includes">
+          <span>
+            <strong>{paidTurns}</strong>
+            locked decisions
+          </span>
+          <span>
+            <strong>{config.endings.totalSlots}</strong>
+            possible {endingNoun}s
+          </span>
+          <span>
+            <strong>1</strong>
+            exact save
+          </span>
+        </div>
         <div className="pw-price-card">
+          <span className="pw-price-kicker">Launch unlock</span>
           <strong className="pw-price">{price}</strong>
-          <span>One-time unlock for this run</span>
+          <span>Finish this run, no subscription</span>
         </div>
         <CreemEmbeddedCheckout
           runId={run.id}
@@ -81,15 +96,15 @@ export function Paywall({ config, run }: { config: SimulatorConfig; run: RunReco
           </aside>
         ) : null}
         <ul className="benefits">
-          <li>Continue from this exact save state</li>
-          <li>Unlock the full current campaign and ending</li>
-          <li>Secure checkout, no subscription, refund support available</li>
+          <li>Your name, stats, and last choices carry forward</li>
+          <li>Resolve the crisis and receive your personalized {endingNoun}</li>
+          <li>Secure embedded checkout, no subscription, refund support available</li>
         </ul>
         <Link className="muted fine-print text-link" href={`/${config.slug}${variantSearch}`}>
           Return later
         </Link>
         <p className="muted fine-print">
-          New campaigns and replays unlock separately.
+          This unlock keeps the current {noun} available from this save.
         </p>
       </section>
       <LegalLinks />

@@ -1205,7 +1205,7 @@ select:focus {
 .pw-price-card {
   display: grid;
   justify-items: center;
-  gap: 6px;
+  gap: 7px;
   padding: 20px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -1213,6 +1213,50 @@ select:focus {
     radial-gradient(70% 70% at 50% 0%, var(--gold-soft), transparent 80%),
     rgba(0, 0, 0, 0.2);
   text-align: center;
+}
+
+.pw-value-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--line);
+}
+
+.pw-value-strip span {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 12px 8px;
+  color: var(--ink-dim);
+  background: rgba(0, 0, 0, 0.28);
+  font-family: var(--condensed);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1.2;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.pw-value-strip strong {
+  color: var(--gold);
+  font-family: var(--display);
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.pw-price-kicker {
+  color: var(--rose);
+  font-family: var(--condensed);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
 .pw-price {
