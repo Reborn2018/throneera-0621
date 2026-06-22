@@ -921,6 +921,7 @@ select:focus {
   width: 100%;
   min-height: 78px;
   position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: 32px minmax(0, 1fr);
   align-items: start;
@@ -935,11 +936,43 @@ select:focus {
   transition: transform 0.16s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
+.theme-queen .choice {
+  overflow: hidden;
+  padding-top: 31px;
+  border-color: rgba(208, 170, 94, 0.22);
+  background:
+    radial-gradient(12rem 6rem at 94% 50%, rgba(201, 75, 95, 0.13), transparent 62%),
+    linear-gradient(90deg, rgba(208, 170, 94, 0.1), transparent 22%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 7px),
+    var(--surface);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.035);
+}
+
+.theme-queen .choice::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  background: linear-gradient(100deg, transparent 0%, transparent 38%, rgba(255, 227, 157, 0.11) 48%, transparent 58%);
+  transform: translateX(-115%);
+  transition: transform 0.46s ease;
+}
+
 .choice:hover,
 .choice:focus-visible {
   border-color: var(--gold);
   background: var(--surface-2);
   transform: translateX(3px);
+}
+
+.theme-queen .choice:hover::before,
+.theme-queen .choice:focus-visible::before {
+  transform: translateX(115%);
+}
+
+.theme-queen .choice:hover,
+.theme-queen .choice:focus-visible {
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.22), inset 3px 0 0 rgba(208, 170, 94, 0.58);
 }
 
 .choice-tone {
@@ -961,6 +994,15 @@ select:focus {
   white-space: nowrap;
 }
 
+.theme-queen .choice-tone {
+  top: 9px;
+  right: 9px;
+  max-width: 46%;
+  border: 1px solid rgba(208, 170, 94, 0.2);
+  border-radius: 999px;
+  background: rgba(208, 170, 94, 0.1);
+}
+
 .choice-num {
   width: 30px;
   height: 30px;
@@ -974,6 +1016,12 @@ select:focus {
   line-height: 1;
 }
 
+.theme-queen .choice-num {
+  border: 2px solid rgba(255, 221, 145, 0.34);
+  background: radial-gradient(circle at 36% 30%, rgba(201, 75, 95, 0.7), rgba(87, 25, 39, 0.82) 72%);
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.22), 0 2px 7px rgba(0, 0, 0, 0.28);
+}
+
 .theme-napoleon .choice-num {
   border-radius: var(--radius);
   font-family: var(--font-cinzel), Georgia, serif;
@@ -985,6 +1033,10 @@ select:focus {
   display: grid;
   gap: 6px;
   padding-right: 20px;
+}
+
+.theme-queen .choice-body {
+  padding-right: 0;
 }
 
 .choice-label {
@@ -1368,6 +1420,31 @@ select:focus {
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.pw-reassurance {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: -8px;
+}
+
+.pw-reassurance span {
+  min-height: 31px;
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 10px;
+  border: 1px solid rgba(208, 170, 94, 0.18);
+  border-radius: 999px;
+  color: var(--ink-dim);
+  background: rgba(208, 170, 94, 0.07);
+  font-family: var(--condensed);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1;
   text-transform: uppercase;
 }
 

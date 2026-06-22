@@ -61,6 +61,11 @@ export function Paywall({ config, run }: { config: SimulatorConfig; run: RunReco
           <strong className="pw-price">{price}</strong>
           <span>Finish this run, no subscription</span>
         </div>
+        <div className="pw-reassurance" aria-label="Checkout reassurance">
+          <span>Secure embedded checkout</span>
+          <span>Instant unlock after payment</span>
+          <span>No subscription</span>
+        </div>
         <CreemEmbeddedCheckout
           runId={run.id}
           simulator={config.slug}
