@@ -3,16 +3,10 @@ import Image from "next/image";
 import { BrandHeader } from "@/components/brand-header";
 import { LegalLinks } from "@/components/legal-links";
 import type { SimulatorConfig } from "@/lib/types";
-import {
-  getFormattedPrice,
-  getSimulatorVisuals,
-  getStoryTurnCount,
-} from "@/lib/simulators/presentation";
+import { getSimulatorVisuals } from "@/lib/simulators/presentation";
 import { variantSearchForConfig } from "@/lib/variants";
 
 export function LandingHero({ config }: { config: SimulatorConfig }) {
-  const price = getFormattedPrice(config);
-  const storyTurns = getStoryTurnCount(config);
   const visuals = getSimulatorVisuals(config);
   const showAlternateCampaign = config.slug !== "queen";
   const alternate = showAlternateCampaign ? config.crossSell.target : null;
@@ -51,17 +45,15 @@ export function LandingHero({ config }: { config: SimulatorConfig }) {
               </Link>
             ) : null}
           </div>
-          <p className="conversion-line">
-            Free start / {price} full campaign / no subscription
-          </p>
+          <p className="conversion-line">Begin inside the crisis. No account needed.</p>
         </div>
       </section>
-      <section className="landing-support" aria-label="Campaign details">
+      <section className="landing-support" aria-label="Story tension">
         <div className="trust-strip">
-          <span>{config.prologueScenes.length} free turns</span>
-          <span>{storyTurns} total story turns</span>
-          <span>{config.endings.totalSlots} endings</span>
-          <span>No sign-up</span>
+          <span>Public humiliation</span>
+          <span>Dangerous choices</span>
+          <span>The court remembers</span>
+          <span>No account needed</span>
         </div>
         <div className="landing-proof">
           <p>{visuals.promise}</p>

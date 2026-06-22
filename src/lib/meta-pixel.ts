@@ -6,6 +6,7 @@ export interface MetaPixelRouteEvent {
 }
 
 const SIMULATOR_SLUGS = new Set(["queen", "napoleon"]);
+const QUEEN_VARIANTS = ["legacy", "crown", "betrayal"];
 
 export function getMetaPixelRouteEvent(
   pathname: string,
@@ -18,17 +19,7 @@ export function getMetaPixelRouteEvent(
     return null;
   }
 
-  const normalizedVariant =
-    simulator === "queen" && variantId && ["legacy", "crown", "betrayal"].includes(variantId)
-      ? variantId
-      : simulator === "queen"
-        ? "legacy"
-        : "default";
-  const contentName = `throneera_${simulator}_${normalizedVariant}`;
-  const baseParams = {
-    variant_id: normalizedVariant,
-    experiment_id: simulator === "queen" ? "queen_offer_hook_2026_06_22" : "default",
-  };
+  const { contentName, baseParams } = getMetaPixelContext(simulator, variantId);
 
   if (segments.length === 1) {
     return {
@@ -65,7 +56,7 @@ export function getMetaPixelRouteEvent(
 
   if (segments[1] === "unlock") {
     return {
-      name: "InitiateCheckout",
+      name: "ViewContent",
       params: {
         ...baseParams,
         content_name: `${contentName}_paywall`,
@@ -75,4 +66,40 @@ export function getMetaPixelRouteEvent(
   }
 
   return null;
+}
+
+export function getMetaPixelCheckoutStartedEvent(
+  simulator: string,
+  variantId?: string,
+): MetaPixelRouteEvent | null {
+  if (!SIMULATOR_SLUGS.has(simulator)) {
+    return null;
+  }
+
+  const { contentName, baseParams } = getMetaPixelContext(simulator, variantId);
+  return {
+    name: "InitiateCheckout",
+    params: {
+      ...baseParams,
+      content_name: `${contentName}_checkout_click`,
+      content_category: "campaign_checkout",
+    },
+  };
+}
+
+function getMetaPixelContext(simulator: string, variantId?: string) {
+  const normalizedVariant =
+    simulator === "queen" && variantId && QUEEN_VARIANTS.includes(variantId)
+      ? variantId
+      : simulator === "queen"
+        ? "legacy"
+        : "default";
+
+  return {
+    contentName: `throneera_${simulator}_${normalizedVariant}`,
+    baseParams: {
+      variant_id: normalizedVariant,
+      experiment_id: simulator === "queen" ? "queen_offer_hook_2026_06_22" : "default",
+    },
+  };
 }

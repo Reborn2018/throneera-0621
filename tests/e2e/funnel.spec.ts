@@ -2,6 +2,12 @@ import { expect, test } from "@playwright/test";
 
 type QueenVariant = "legacy" | "crown" | "betrayal";
 
+declare global {
+  interface Window {
+    __recordFbqCall: (...args: unknown[]) => void;
+  }
+}
+
 async function startRun(
   page: import("@playwright/test").Page,
   simulator: "queen" | "napoleon",
@@ -55,7 +61,7 @@ test("Queen mobile free funnel reaches the current-run paywall", async ({ page }
 
   await expect(page).toHaveURL(/\/queen\/unlock\//);
   await expect(page.getByRole("heading", { name: /finish the reign your choices started/i })).toBeVisible();
-  await expect(page.getByText(/this unlock keeps the current reign available/i)).toBeVisible();
+  await expect(page.getByText(/one-time unlock for this saved story/i)).toBeVisible();
 });
 
 test("Queen ad funnel hides Napoleon entry points before paywall", async ({ page }) => {
@@ -70,6 +76,45 @@ test("Queen ad funnel hides Napoleon entry points before paywall", async ({ page
   await page.getByRole("button", { name: /begin the first turn/i }).click();
   await expect(page.getByRole("button", { name: /kneel slowly/i })).toBeVisible();
   await expect(page.getByRole("link", { name: /napoleon/i })).toHaveCount(0);
+});
+
+for (const variant of ["legacy", "crown", "betrayal"] as const) {
+  test(`Queen ${variant} landing keeps price and story length hidden`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(`/queen?variant=${variant}`);
+
+    await expect(page.getByText(/\$7\.99|full campaign|free turns|total story turns|endings/i)).toHaveCount(0);
+    await expect(page.getByText(/begin inside the crisis/i)).toBeVisible();
+  });
+}
+
+test("Meta pixel fires InitiateCheckout only after the checkout button click", async ({ page }) => {
+  const fbqCalls: unknown[][] = [];
+  await page.exposeFunction("__recordFbqCall", (...args: unknown[]) => {
+    fbqCalls.push(args);
+  });
+  await page.addInitScript(() => {
+    window.fbq = (action, eventName, params) => {
+      void window.__recordFbqCall(action, eventName, params);
+    };
+  });
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await startRun(page, "queen", "crown");
+  await clickChoices(page, [
+    /kneel slowly/i,
+    /amnesty/i,
+    /address the crowd/i,
+    /borrow against/i,
+    /step over/i,
+  ]);
+
+  expect(fbqCalls.some((call) => call[0] === "track" && call[1] === "InitiateCheckout")).toBe(false);
+
+  await page.getByRole("button", { name: /reclaim my crown/i }).click();
+  await expect
+    .poll(() => fbqCalls.filter((call) => call[0] === "track" && call[1] === "InitiateCheckout").length)
+    .toBe(1);
 });
 
 test("Queen crown variant mobile free funnel reaches the current-run paywall", async ({ page }) => {

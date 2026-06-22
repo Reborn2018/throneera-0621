@@ -12,6 +12,7 @@ const webServer =
         env: {
           THRONEERA_ALLOW_MOCK_CHECKOUT: "true",
           THRONEERA_LOCAL_STORE_PATH: ".throneera/e2e-store.json",
+          META_PIXEL_ID: "test_pixel",
         },
       };
 

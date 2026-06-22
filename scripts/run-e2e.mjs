@@ -9,6 +9,7 @@ const env = {
   ...process.env,
   THRONEERA_ALLOW_MOCK_CHECKOUT: "true",
   THRONEERA_LOCAL_STORE_PATH: ".throneera/e2e-store.json",
+  META_PIXEL_ID: "test_pixel",
 };
 
 await rm(join(root, ".throneera", "e2e-store.json"), { force: true });

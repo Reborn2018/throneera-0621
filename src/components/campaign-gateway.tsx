@@ -3,11 +3,7 @@ import Link from "next/link";
 import { BrandHeader } from "@/components/brand-header";
 import { LegalLinks } from "@/components/legal-links";
 import type { SimulatorConfig } from "@/lib/types";
-import {
-  getFormattedPrice,
-  getSimulatorVisuals,
-  getStoryTurnCount,
-} from "@/lib/simulators/presentation";
+import { getSimulatorVisuals } from "@/lib/simulators/presentation";
 
 export function CampaignGateway({ campaigns }: { campaigns: SimulatorConfig[] }) {
   return (
@@ -24,8 +20,6 @@ export function CampaignGateway({ campaigns }: { campaigns: SimulatorConfig[] })
       <section className="gateway-grid" aria-label="Choose a simulator">
         {campaigns.map((config) => {
           const visuals = getSimulatorVisuals(config);
-          const storyTurns = getStoryTurnCount(config);
-          const price = getFormattedPrice(config);
 
           return (
             <Link
@@ -45,10 +39,7 @@ export function CampaignGateway({ campaigns }: { campaigns: SimulatorConfig[] })
                 <span className="eyebrow">{visuals.kicker}</span>
                 <strong>{config.title}</strong>
                 <span>{config.landing.subhead}</span>
-                <small>
-                  {config.prologueScenes.length} free turns / {storyTurns} total /{" "}
-                  {price} full campaign
-                </small>
+                <small>Enter the crisis. Make the first irreversible order.</small>
               </span>
             </Link>
           );

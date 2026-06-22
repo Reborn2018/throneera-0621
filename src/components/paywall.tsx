@@ -10,7 +10,6 @@ import { variantSearchForConfig } from "@/lib/variants";
 export function Paywall({ config, run }: { config: SimulatorConfig; run: RunRecord }) {
   const price = getFormattedPrice(config);
   const decisions = run.decisions.slice(-3).reverse();
-  const paidTurns = config.paidScenes.length;
   const noun = config.slug === "queen" ? "reign" : "campaign";
   const crisis =
     config.paywall?.crisis ??
@@ -20,28 +19,32 @@ export function Paywall({ config, run }: { config: SimulatorConfig; run: RunReco
   const loss = config.paywall?.loss ?? "Leave now and this crisis remains unresolved.";
   const cta = config.paywall?.cta ?? `Continue My ${config.slug === "queen" ? "Reign" : "Campaign"}`;
   const endingNoun = config.slug === "queen" ? "ending" : "finale";
-  const pitch = getPaywallPitch(config, run, paidTurns, endingNoun);
+  const pitch = getPaywallPitch(config, run, endingNoun);
+  const unlockLabel = config.slug === "queen" ? "Finish this reign" : "Complete this campaign";
   const variantSearch = variantSearchForConfig(config);
   const embeddedCheckoutEnabled =
     process.env.VERCEL_ENV === "production" &&
     process.env.THRONEERA_CREEM_EMBEDDED_CHECKOUT !== "false";
 
   return (
-    <main className={`page product-page ${config.themeClass}`}>
+    <main className={`page product-page paywall-page ${config.themeClass}`}>
       <BrandHeader simulator={config.slug} />
       <section className="panel paywall-panel">
-        <div className="pw-cliff">
-          <p>{crisis}</p>
+        <div className="pw-stage">
+          <div className="pw-seal" aria-hidden="true">
+            <Image src="/assets/throne-era-logo.png" alt="" width={64} height={64} />
+          </div>
+          <p className="pw-cliff">{crisis}</p>
+          <p className="pw-loss">{loss}</p>
         </div>
 
-        <div className="pw-seal" aria-hidden="true">
-          <Image src="/assets/throne-era-logo.png" alt="" width={64} height={64} />
+        <div className="pw-offer">
+          <span className="pw-case-kicker">{pitch.kicker}</span>
+          <h1>{pitch.headline}</h1>
+          <p className="copy">{pitch.lead}</p>
         </div>
-        <p className="pw-loss">{loss}</p>
-        <h1>{pitch.headline}</h1>
-        <p className="copy">{pitch.lead}</p>
-        <div className="pw-unlock-case" aria-label="Why unlock this run">
-          <span className="pw-case-kicker">What your unlock protects</span>
+
+        <div className="pw-unlock-case" aria-label="What this unlock includes">
           <ul className="pw-proof-list">
             {pitch.proof.map((item) => (
               <li key={item}>{item}</li>
@@ -49,25 +52,15 @@ export function Paywall({ config, run }: { config: SimulatorConfig; run: RunReco
           </ul>
           <p>{pitch.stakes}</p>
         </div>
-        <div className="pw-value-strip" aria-label="What this unlock includes">
-          <span>
-            <strong>{paidTurns}</strong>
-            locked decisions
-          </span>
-          <span>
-            <strong>{config.endings.totalSlots}</strong>
-            possible {endingNoun}s
-          </span>
-          <span>
-            <strong>1</strong>
-            exact save
-          </span>
+
+        <div className="pw-price-card" aria-label={`${unlockLabel} price`}>
+          <div>
+            <span className="pw-price-kicker">{unlockLabel}</span>
+            <strong className="pw-price">{price}</strong>
+          </div>
+          <span>One-time unlock for this saved story. No subscription.</span>
         </div>
-        <div className="pw-price-card">
-          <span className="pw-price-kicker">Launch unlock</span>
-          <strong className="pw-price">{price}</strong>
-          <span>Finish this run, no subscription</span>
-        </div>
+
         <div className="pw-reassurance" aria-label="Checkout reassurance">
           <span>Secure embedded checkout</span>
           <span>Instant unlock after payment</span>
@@ -111,7 +104,7 @@ export function Paywall({ config, run }: { config: SimulatorConfig; run: RunReco
           Return later
         </Link>
         <p className="muted fine-print">
-          This unlock keeps the current {noun} available from this save.
+          Payment unlocks the rest of this exact {noun} immediately after checkout.
         </p>
       </section>
       <LegalLinks />
@@ -122,17 +115,17 @@ export function Paywall({ config, run }: { config: SimulatorConfig; run: RunReco
 function getPaywallPitch(
   config: SimulatorConfig,
   run: RunRecord,
-  paidTurns: number,
   endingNoun: string,
 ) {
   if (config.slug === "queen" && config.variantId === "crown") {
     return {
+      kicker: "The crown is one signature from being lost",
       headline: "Do not let her keep your crown.",
-      lead: `${run.identity.name}, the court has already seen your answer. Unlock the rest of this run to see whether your sister kneels, is exposed, or makes your humiliation permanent.`,
+      lead: `${run.identity.name}, the court has already seen your answer. Continue this exact save to see whether your sister kneels, is exposed, or makes your humiliation permanent.`,
       proof: [
-        "Your exact choices, posture, and court stats carry forward",
-        `The next ${paidTurns} locked decisions resolve the stolen-crown crisis`,
-        `Reach one of ${config.endings.totalSlots} endings shaped by your revenge`,
+        "Carry forward your exact choices, posture, allies, and court stats",
+        "Resolve the stolen-crown crisis instead of stopping at the humiliation",
+        `Reveal a personalized ${endingNoun} shaped by your revenge route`,
       ],
       stakes: "Stop here and Seraphine keeps the crown, the court, and the public story.",
     };
@@ -140,12 +133,13 @@ function getPaywallPitch(
 
   if (config.slug === "queen" && config.variantId === "betrayal") {
     return {
+      kicker: "Tonight decides who owns the succession",
       headline: "Make the betrayal answer to you.",
-      lead: `${run.identity.name}, your husband thinks tonight ends with your signature. Unlock the rest of this run to turn the heir scandal into judgment, exile, or revenge.`,
+      lead: `${run.identity.name}, your husband thinks tonight ends with your signature. Continue this exact save to turn the heir scandal into judgment, exile, or revenge.`,
       proof: [
-        "Your exact choices, identity, and court stats carry forward",
-        `The next ${paidTurns} locked decisions decide the marriage, the heir, and the throne`,
-        `Reach one of ${config.endings.totalSlots} endings shaped by how you strike back`,
+        "Carry forward your exact choices, identity, leverage, and court stats",
+        "Resolve the marriage trap, heir scandal, and throne crisis in this saved story",
+        `Reveal a personalized ${endingNoun} shaped by how you strike back`,
       ],
       stakes: "Stop here and Rowan writes you out of the succession before dawn.",
     };
@@ -153,24 +147,26 @@ function getPaywallPitch(
 
   if (config.slug === "queen") {
     return {
+      kicker: "Your court is already reacting",
       headline: "Finish the reign your choices started.",
-      lead: `${run.identity.name}, your court is already reacting to your first decrees. Unlock the rest of this run to resolve the rebellion and reveal the personalized ${endingNoun} your reign has earned.`,
+      lead: `${run.identity.name}, your court is already reacting to your first decrees. Continue this exact save to resolve the rebellion and reveal the personalized ${endingNoun} your reign has earned.`,
       proof: [
-        "Your name, stats, and last choices carry forward",
-        `The next ${paidTurns} locked decisions decide whether your reign survives`,
-        `Reach one of ${config.endings.totalSlots} endings written around your route`,
+        "Carry forward your name, stats, and every choice that brought you here",
+        "Resolve the rebellion instead of abandoning your unfinished reign",
+        `Reveal a personalized ${endingNoun} written around your route`,
       ],
       stakes: "Stop here and this version of your reign stays unfinished.",
     };
   }
 
   return {
+    kicker: "Your campaign is still unresolved",
     headline: config.offer.label,
     lead: `Finish this crisis from your exact save, carry every choice forward, and reveal the personalized ${endingNoun} your campaign has earned.`,
     proof: [
       "Your name, stats, and last choices carry forward",
-      `The next ${paidTurns} locked decisions resolve this campaign`,
-      `Reach one of ${config.endings.totalSlots} possible ${endingNoun}s`,
+      "Resolve this campaign from your current save",
+      `Reveal a personalized ${endingNoun} shaped by your route`,
     ],
     stakes: "Stop here and this campaign remains unresolved.",
   };

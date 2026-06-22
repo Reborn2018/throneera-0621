@@ -3,6 +3,7 @@
 import { CreemCheckoutInline } from "@creem_io/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { normalizeCreemCheckoutUrl } from "@/lib/checkout-url";
+import { getMetaPixelCheckoutStartedEvent } from "@/lib/meta-pixel";
 import type { SimulatorSlug } from "@/lib/types";
 
 type CheckoutMode = "open" | "prefetch";
@@ -106,6 +107,30 @@ export function CreemEmbeddedCheckout({
     }).catch(() => undefined);
   }
 
+  function trackMetaCheckoutStarted(): void {
+    if (typeof window.fbq !== "function") {
+      return;
+    }
+
+    const variantId = new URLSearchParams(variantSearch).get("variant") ?? undefined;
+    const event = getMetaPixelCheckoutStartedEvent(simulator, variantId);
+    if (!event) {
+      return;
+    }
+
+    const storageKey = `throneera:meta-checkout:${runId}`;
+    try {
+      if (window.sessionStorage.getItem(storageKey)) {
+        return;
+      }
+      window.sessionStorage.setItem(storageKey, "1");
+    } catch {
+      // If sessionStorage is blocked, still record the intentional click once in this execution path.
+    }
+
+    window.fbq("track", event.name, event.params);
+  }
+
   function completeCheckout(detail: { redirectUrl?: string }): void {
     const returnUrl =
       detail.redirectUrl ?? `/${simulator}/return?runId=${encodeURIComponent(runId)}${variantSearch ? `&${variantSearch.slice(1)}` : ""}`;
@@ -118,6 +143,8 @@ export function CreemEmbeddedCheckout({
   }
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+    trackMetaCheckoutStarted();
+
     if (!enabled) {
       return;
     }

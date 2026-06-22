@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { getMetaPixelRouteEvent } from "@/lib/meta-pixel";
+import {
+  getMetaPixelCheckoutStartedEvent,
+  getMetaPixelRouteEvent,
+} from "@/lib/meta-pixel";
 
 describe("Meta Pixel route events", () => {
   it("tracks simulator landing pages as ViewContent", () => {
@@ -38,14 +41,26 @@ describe("Meta Pixel route events", () => {
     });
   });
 
-  it("tracks paywall views as InitiateCheckout", () => {
+  it("tracks paywall views without firing InitiateCheckout", () => {
     expect(getMetaPixelRouteEvent("/queen/unlock/run_123", "betrayal")).toEqual({
-      name: "InitiateCheckout",
+      name: "ViewContent",
       params: {
         variant_id: "betrayal",
         experiment_id: "queen_offer_hook_2026_06_22",
         content_name: "throneera_queen_betrayal_paywall",
         content_category: "campaign_unlock",
+      },
+    });
+  });
+
+  it("tracks checkout button clicks as InitiateCheckout", () => {
+    expect(getMetaPixelCheckoutStartedEvent("queen", "crown")).toEqual({
+      name: "InitiateCheckout",
+      params: {
+        variant_id: "crown",
+        experiment_id: "queen_offer_hook_2026_06_22",
+        content_name: "throneera_queen_crown_checkout_click",
+        content_category: "campaign_checkout",
       },
     });
   });

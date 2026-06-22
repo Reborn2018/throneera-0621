@@ -4,7 +4,7 @@ import type { FormEvent } from "react";
 import { useRef, useState } from "react";
 import type { SceneChoice, SimulatorConfig, StoryScene } from "@/lib/types";
 
-const IMPACT_DELAY_MS = 1050;
+const IMPACT_DELAY_MS = 1350;
 
 interface ChoiceImpact {
   id: string;
@@ -90,6 +90,11 @@ export function ChoiceList({
             <span className="choice-impact-stamp">{impact.intent}</span>
             <p className="choice-impact-echo">{impact.label}</p>
             {impact.hint ? <p className="choice-impact-hint">{impact.hint}</p> : null}
+            <div className="choice-impact-path" aria-hidden="true">
+              <span />
+              <span />
+              <span />
+            </div>
             {impact.deltas.length ? (
               <div className="choice-impact-deltas" aria-label="Stat changes">
                 {impact.deltas.map((delta) => (
