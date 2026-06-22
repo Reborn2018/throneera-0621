@@ -2,8 +2,20 @@ import Link from "next/link";
 import Image from "next/image";
 import type { SimulatorSlug } from "@/lib/types";
 
-export function BrandHeader({ simulator }: { simulator?: SimulatorSlug }) {
-  const alternate = simulator === "queen" ? "napoleon" : simulator === "napoleon" ? "queen" : null;
+export function BrandHeader({
+  simulator,
+  showCampaignSwitcher = false,
+}: {
+  simulator?: SimulatorSlug;
+  showCampaignSwitcher?: boolean;
+}) {
+  const alternate = showCampaignSwitcher
+    ? simulator === "queen"
+      ? "napoleon"
+      : simulator === "napoleon"
+        ? "queen"
+        : null
+    : null;
   const alternateLabel = alternate === "queen" ? "Queen" : alternate === "napoleon" ? "Napoleon" : null;
 
   return (

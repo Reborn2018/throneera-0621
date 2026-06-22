@@ -1,32 +1,8 @@
 "use client";
 
-import Script from "next/script";
+import { useCreemCheckout } from "@creem_io/react";
 import { useRef, useState } from "react";
 import type { SimulatorSlug } from "@/lib/types";
-
-interface CreemCompleteDetail {
-  checkoutId?: string;
-  orderId?: string;
-  orderNo?: string;
-  redirect?: boolean;
-  redirectUrl?: string;
-}
-
-interface CreemEmbed {
-  openCheckout(options: {
-    checkoutUrl: string;
-    theme?: "light" | "dark";
-    onComplete?: (detail: CreemCompleteDetail) => void;
-    onClose?: () => void;
-    onReady?: () => void;
-  }): { close: () => void };
-}
-
-declare global {
-  interface Window {
-    Creem?: CreemEmbed;
-  }
-}
 
 export function CreemEmbeddedCheckout({
   runId,
@@ -42,16 +18,12 @@ export function CreemEmbeddedCheckout({
   enabled: boolean;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
+  const openCheckout = useCreemCheckout();
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     if (!enabled) {
-      return;
-    }
-
-    const creem = window.Creem;
-    if (!creem?.openCheckout) {
       return;
     }
 
@@ -78,7 +50,7 @@ export function CreemEmbeddedCheckout({
         throw new Error("Checkout URL missing");
       }
 
-      creem.openCheckout({
+      openCheckout({
         checkoutUrl: session.checkoutUrl,
         theme: "dark",
         onComplete(detail) {
@@ -102,7 +74,6 @@ export function CreemEmbeddedCheckout({
 
   return (
     <>
-      {enabled ? <Script src="https://www.creem.io/embed.js" strategy="afterInteractive" /> : null}
       <form ref={formRef} className="actions" method="post" action="/api/checkout" onSubmit={onSubmit}>
         <input type="hidden" name="runId" value={runId} />
         <button className="button" type="submit" aria-busy={isPending}>

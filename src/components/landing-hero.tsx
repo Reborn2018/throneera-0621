@@ -14,7 +14,8 @@ export function LandingHero({ config }: { config: SimulatorConfig }) {
   const price = getFormattedPrice(config);
   const storyTurns = getStoryTurnCount(config);
   const visuals = getSimulatorVisuals(config);
-  const alternate = config.crossSell.target;
+  const showAlternateCampaign = config.slug !== "queen";
+  const alternate = showAlternateCampaign ? config.crossSell.target : null;
   const variantSearch = variantSearchForConfig(config);
 
   return (
@@ -43,9 +44,11 @@ export function LandingHero({ config }: { config: SimulatorConfig }) {
             <Link className="button" href={`/${config.slug}/start${variantSearch}`}>
               {config.landing.cta}
             </Link>
-            <Link className="button button-ghost" href={`/${alternate}`}>
-              {visuals.switchLabel}
-            </Link>
+            {alternate ? (
+              <Link className="button button-ghost" href={`/${alternate}`}>
+                {visuals.switchLabel}
+              </Link>
+            ) : null}
           </div>
           <p className="conversion-line">
             Free start / {price} full campaign / no subscription

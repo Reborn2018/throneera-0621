@@ -58,6 +58,20 @@ test("Queen mobile free funnel reaches the current-run paywall", async ({ page }
   await expect(page.getByText(/new campaigns and replays unlock separately/i)).toBeVisible();
 });
 
+test("Queen ad funnel hides Napoleon entry points before paywall", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/queen?variant=crown");
+  await expect(page.getByRole("link", { name: /napoleon/i })).toHaveCount(0);
+  await expect(page.getByText(/Try Napoleon Simulator/i)).toHaveCount(0);
+
+  await page.getByRole("link", { name: /take back the crown/i }).click();
+  await expect(page.getByRole("link", { name: /napoleon/i })).toHaveCount(0);
+
+  await page.getByRole("button", { name: /begin the first turn/i }).click();
+  await expect(page.getByRole("button", { name: /kneel slowly/i })).toBeVisible();
+  await expect(page.getByRole("link", { name: /napoleon/i })).toHaveCount(0);
+});
+
 test("Queen crown variant mobile free funnel reaches the current-run paywall", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await startRun(page, "queen", "crown");
