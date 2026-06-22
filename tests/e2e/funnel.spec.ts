@@ -54,7 +54,7 @@ test("Queen mobile free funnel reaches the current-run paywall", async ({ page }
   await clickChoices(page, [/protect/i, /public trial/i, /break the seal/i, /torn envelope/i, /face the dawn/i]);
 
   await expect(page).toHaveURL(/\/queen\/unlock\//);
-  await expect(page.getByRole("heading", { name: /complete your reign/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /finish the reign your choices started/i })).toBeVisible();
   await expect(page.getByText(/this unlock keeps the current reign available/i)).toBeVisible();
 });
 
@@ -84,7 +84,7 @@ test("Queen crown variant mobile free funnel reaches the current-run paywall", a
   ]);
 
   await expect(page).toHaveURL(/\/queen\/unlock\/.*variant=crown/);
-  await expect(page.getByRole("heading", { name: /complete your reign/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /do not let her keep your crown/i })).toBeVisible();
   await expect(page.getByRole("button", { name: /reclaim my crown/i })).toBeVisible();
 });
 
@@ -100,7 +100,7 @@ test("Queen betrayal variant mobile free funnel reaches the current-run paywall"
   ]);
 
   await expect(page).toHaveURL(/\/queen\/unlock\/.*variant=betrayal/);
-  await expect(page.getByRole("heading", { name: /complete your reign/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /make the betrayal answer to you/i })).toBeVisible();
   await expect(page.getByRole("button", { name: /turn the betrayal back/i })).toBeVisible();
 });
 
