@@ -17,9 +17,10 @@ export function LandingHero({ config }: { config: SimulatorConfig }) {
   const showAlternateCampaign = config.slug !== "queen";
   const alternate = showAlternateCampaign ? config.crossSell.target : null;
   const variantSearch = variantSearchForConfig(config);
+  const variantClass = config.variantId ? `variant-${config.variantId}` : "";
 
   return (
-    <main className={`page product-page ${config.themeClass}`}>
+    <main className={`page product-page ${config.themeClass} ${variantClass}`}>
       <BrandHeader simulator={config.slug} />
       <section className="hero cinematic-hero">
         <Image

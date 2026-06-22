@@ -1,8 +1,10 @@
 "use client";
 
 import { useCreemCheckout } from "@creem_io/react";
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { SimulatorSlug } from "@/lib/types";
+
+type CheckoutMode = "open" | "prefetch";
 
 export function CreemEmbeddedCheckout({
   runId,
@@ -19,26 +21,21 @@ export function CreemEmbeddedCheckout({
 }) {
   const formRef = useRef<HTMLFormElement>(null);
   const openCheckout = useCreemCheckout();
+  const checkoutUrlRef = useRef<string | null>(null);
+  const prefetchPromiseRef = useRef<Promise<string | null> | null>(null);
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
-    if (!enabled) {
-      return;
-    }
-
-    event.preventDefault();
-    setIsPending(true);
-    setError(null);
-
-    try {
+  const requestCheckout = useCallback(
+    async (mode: CheckoutMode, signal?: AbortSignal): Promise<string> => {
       const response = await fetch("/api/checkout", {
         method: "POST",
         headers: {
           "content-type": "application/json",
           accept: "application/json",
         },
-        body: JSON.stringify({ runId }),
+        body: JSON.stringify({ runId, mode }),
+        signal,
       });
 
       if (!response.ok) {
@@ -50,9 +47,64 @@ export function CreemEmbeddedCheckout({
         throw new Error("Checkout URL missing");
       }
 
+      checkoutUrlRef.current = session.checkoutUrl;
+      return session.checkoutUrl;
+    },
+    [runId],
+  );
+
+  useEffect(() => {
+    if (!enabled || checkoutUrlRef.current || prefetchPromiseRef.current) {
+      return;
+    }
+
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => {
+      prefetchPromiseRef.current = requestCheckout("prefetch", controller.signal).catch(() => null);
+    }, 700);
+
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+  }, [enabled, requestCheckout]);
+
+  function recordCheckoutStarted(): void {
+    void fetch("/api/checkout", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        accept: "application/json",
+      },
+      body: JSON.stringify({ runId, mode: "open" }),
+      keepalive: true,
+    }).catch(() => undefined);
+  }
+
+  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+    if (!enabled) {
+      return;
+    }
+
+    event.preventDefault();
+    setIsPending(true);
+    setError(null);
+
+    try {
+      const prefetchedCheckoutUrl =
+        checkoutUrlRef.current ?? (prefetchPromiseRef.current ? await prefetchPromiseRef.current : null);
+      const checkoutUrl = prefetchedCheckoutUrl ?? (await requestCheckout("open"));
+
+      if (prefetchedCheckoutUrl) {
+        recordCheckoutStarted();
+      }
+
       openCheckout({
-        checkoutUrl: session.checkoutUrl,
+        checkoutUrl,
         theme: "dark",
+        onReady() {
+          setIsPending(false);
+        },
         onComplete(detail) {
           const returnUrl =
             detail.redirectUrl ?? `/${simulator}/return?runId=${encodeURIComponent(runId)}${variantSearch ? `&${variantSearch.slice(1)}` : ""}`;
@@ -76,7 +128,7 @@ export function CreemEmbeddedCheckout({
     <>
       <form ref={formRef} className="actions" method="post" action="/api/checkout" onSubmit={onSubmit}>
         <input type="hidden" name="runId" value={runId} />
-        <button className="button" type="submit" aria-busy={isPending}>
+        <button className="button" type="submit" aria-busy={isPending} disabled={isPending}>
           {isPending ? "Opening Secure Checkout..." : label}
         </button>
       </form>

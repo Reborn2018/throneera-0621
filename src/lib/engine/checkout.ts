@@ -20,6 +20,7 @@ interface CheckoutOptions {
   allowMockCheckout: boolean;
   siteUrl?: string;
   checkoutProvider?: CreemCheckoutProvider;
+  trackCheckoutStarted?: boolean;
   now?: Clock;
 }
 
@@ -51,6 +52,7 @@ interface EntitlementOptions {
 
 export async function createCheckoutForRun(options: CheckoutOptions): Promise<CheckoutSession> {
   const run = await requireRun(options.store, options.runId);
+  const trackCheckoutStarted = options.trackCheckoutStarted ?? true;
   if (run.status !== "paywalled" && run.status !== "checkout_pending") {
     throw new Error(`Run is not ready for checkout: ${run.status}`);
   }
@@ -58,7 +60,7 @@ export async function createCheckoutForRun(options: CheckoutOptions): Promise<Ch
   const offer = getSimulatorConfig(run.simulator, getRunVariantId(run)).offer;
   const existing = await options.store.findOpenOrder(run.id, offer.sku);
   if (existing) {
-    await appendRunFunnelEvent(options.store, run, "checkout_started", {
+    await appendRunFunnelEvent(options.store, run, trackCheckoutStarted ? "checkout_started" : "checkout_prefetched", {
       order_id: existing.id,
       provider: existing.provider,
       checkout_status: existing.status,
@@ -93,7 +95,7 @@ export async function createCheckoutForRun(options: CheckoutOptions): Promise<Ch
       status: "checkout_pending",
       updatedAt: now,
     }));
-    await appendRunFunnelEvent(options.store, run, "checkout_started", {
+    await appendRunFunnelEvent(options.store, run, trackCheckoutStarted ? "checkout_started" : "checkout_prefetched", {
       order_id: order.id,
       provider: order.provider,
       checkout_status: order.status,
@@ -144,7 +146,7 @@ export async function createCheckoutForRun(options: CheckoutOptions): Promise<Ch
     status: "checkout_pending",
     updatedAt: now,
   }));
-  await appendRunFunnelEvent(options.store, run, "checkout_started", {
+  await appendRunFunnelEvent(options.store, run, trackCheckoutStarted ? "checkout_started" : "checkout_prefetched", {
     order_id: order.id,
     provider: order.provider,
     checkout_status: order.status,

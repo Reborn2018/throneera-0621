@@ -57,6 +57,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://creem.io" />
+        <link rel="dns-prefetch" href="https://creem.io" />
+        <link rel="preconnect" href="https://www.creem.io" />
+        <link rel="dns-prefetch" href="https://www.creem.io" />
+      </head>
       <body
         className={`${cormorant.variable} ${ebGaramond.variable} ${cinzel.variable} ${spectral.variable} ${barlowCondensed.variable}`}
       >

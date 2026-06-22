@@ -32,16 +32,16 @@ export const simulatorVisuals: Record<SimulatorSlug, SimulatorVisuals> = {
 export const queenVariantVisuals: Record<QueenVariantId, SimulatorVisuals> = {
   legacy: simulatorVisuals.queen,
   crown: {
-    heroImage: "/assets/hero-queen.png",
-    heroAlt: "A queen in a candlelit throne room with a crown and royal court atmosphere.",
+    heroImage: "/assets/hero-queen-crown-v2.png",
+    heroAlt: "A younger sister sits on the throne wearing the stolen crown while the rightful queen enters court.",
     kicker: "Stolen Crown",
     promise: "Your sister has the throne. You have one public moment to make the court choose.",
     proof: "Built to test legality, humiliation, sister rivalry, revenge, and public power.",
     switchLabel: "Try Napoleon Simulator",
   },
   betrayal: {
-    heroImage: "/assets/hero-queen.png",
-    heroAlt: "A queen in a candlelit throne room with a crown and royal court atmosphere.",
+    heroImage: "/assets/hero-queen-betrayal-v2.png",
+    heroAlt: "A betrayed queen faces her husband, another pregnant woman, and an abdication paper at a royal dinner.",
     kicker: "Marriage Betrayal",
     promise: "Your husband brought another woman and an abdication paper to dinner.",
     proof: "Built to test intimate betrayal, heir panic, identity threat, and revenge.",

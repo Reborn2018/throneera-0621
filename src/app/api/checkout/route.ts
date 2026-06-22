@@ -12,6 +12,7 @@ import { getStore } from "@/lib/server/store";
 
 const checkoutSchema = z.object({
   runId: z.string().min(1),
+  mode: z.enum(["open", "prefetch"]).optional().default("open"),
 });
 
 export async function POST(request: Request) {
@@ -32,6 +33,7 @@ export async function POST(request: Request) {
     requestId: crypto.randomUUID(),
     providerProductId: providerProductId ?? "prod_complete_current_campaign",
     allowMockCheckout,
+    trackCheckoutStarted: data.mode === "open",
     siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? new URL(request.url).origin,
     checkoutProvider:
       allowMockCheckout || !creemApiKey

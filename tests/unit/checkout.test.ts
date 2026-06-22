@@ -48,6 +48,38 @@ describe("checkout engine", () => {
     expect(await store.getRun("run-1")).toMatchObject({ status: "checkout_pending" });
   });
 
+  it("can prefetch checkout without counting it as checkout_started", async () => {
+    const store = await createPaywalledRun();
+
+    const prefetched = await createCheckoutForRun({
+      store,
+      runId: "run-1",
+      requestId: "request-1",
+      providerProductId: productId,
+      allowMockCheckout: true,
+      trackCheckoutStarted: false,
+      now: fixedNow,
+    });
+    const opened = await createCheckoutForRun({
+      store,
+      runId: "run-1",
+      requestId: "request-2",
+      providerProductId: productId,
+      allowMockCheckout: true,
+      now: fixedNow,
+    });
+
+    expect(opened.order.id).toBe(prefetched.order.id);
+    expect(
+      (await store.listRunEvents("run-1"))
+        .map((event) => event.eventType)
+        .filter((eventType) => eventType.startsWith("checkout_")),
+    ).toEqual([
+      "checkout_prefetched",
+      "checkout_started",
+    ]);
+  });
+
   it("grants a run entitlement from a verified completed checkout", async () => {
     const store = await createPaywalledRun();
     const checkout = await createCheckoutForRun({

@@ -337,6 +337,14 @@ h3 {
   object-position: 50% 28%;
 }
 
+.theme-queen.variant-crown .hero-image {
+  object-position: 54% 28%;
+}
+
+.theme-queen.variant-betrayal .hero-image {
+  object-position: 46% 30%;
+}
+
 .theme-napoleon .hero-image {
   object-position: 50% 32%;
 }
@@ -1372,6 +1380,14 @@ select:focus {
 
   .cinematic-hero {
     min-height: 72svh;
+  }
+
+  .theme-queen.variant-crown .hero-image {
+    object-position: 57% 18%;
+  }
+
+  .theme-queen.variant-betrayal .hero-image {
+    object-position: 41% 18%;
   }
 
   .hero-copy {
