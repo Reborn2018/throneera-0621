@@ -8,6 +8,7 @@ import { StoryShell } from "@/components/story-shell";
 import { getCurrentScene } from "@/lib/engine/scenes";
 import { getSimulatorConfig, isSimulatorSlug } from "@/lib/simulators";
 import { getStore } from "@/lib/server/store";
+import { getRunVariantId, variantUrlForRun } from "@/lib/variants";
 
 export default async function PlayPage({
   params,
@@ -26,22 +27,22 @@ export default async function PlayPage({
   }
 
   if (run.status === "identity") {
-    redirect(`/${simulator}/start`);
+    redirect(variantUrlForRun(`/${simulator}/start`, run));
   }
 
   if (run.status === "paywalled" || run.status === "checkout_pending") {
-    redirect(`/${simulator}/unlock/${run.id}`);
+    redirect(variantUrlForRun(`/${simulator}/unlock/${run.id}`, run));
   }
 
   if (run.status === "completed") {
-    redirect(`/${simulator}/ending/${run.id}`);
+    redirect(variantUrlForRun(`/${simulator}/ending/${run.id}`, run));
   }
 
   const scene = getCurrentScene(run);
   if (!scene) {
     notFound();
   }
-  const config = getSimulatorConfig(simulator);
+  const config = getSimulatorConfig(simulator, getRunVariantId(run));
 
   return (
     <StoryShell config={config} run={run}>

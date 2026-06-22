@@ -5,8 +5,8 @@ import { LegalLinks } from "@/components/legal-links";
 import type { SimulatorConfig } from "@/lib/types";
 import {
   getFormattedPrice,
+  getSimulatorVisuals,
   getStoryTurnCount,
-  simulatorVisuals,
 } from "@/lib/simulators/presentation";
 
 export function CampaignGateway({ campaigns }: { campaigns: SimulatorConfig[] }) {
@@ -23,7 +23,7 @@ export function CampaignGateway({ campaigns }: { campaigns: SimulatorConfig[] })
       </section>
       <section className="gateway-grid" aria-label="Choose a simulator">
         {campaigns.map((config) => {
-          const visuals = simulatorVisuals[config.slug];
+          const visuals = getSimulatorVisuals(config);
           const storyTurns = getStoryTurnCount(config);
           const price = getFormattedPrice(config);
 

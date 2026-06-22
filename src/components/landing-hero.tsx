@@ -5,15 +5,17 @@ import { LegalLinks } from "@/components/legal-links";
 import type { SimulatorConfig } from "@/lib/types";
 import {
   getFormattedPrice,
+  getSimulatorVisuals,
   getStoryTurnCount,
-  simulatorVisuals,
 } from "@/lib/simulators/presentation";
+import { variantSearchForConfig } from "@/lib/variants";
 
 export function LandingHero({ config }: { config: SimulatorConfig }) {
   const price = getFormattedPrice(config);
   const storyTurns = getStoryTurnCount(config);
-  const visuals = simulatorVisuals[config.slug];
+  const visuals = getSimulatorVisuals(config);
   const alternate = config.crossSell.target;
+  const variantSearch = variantSearchForConfig(config);
 
   return (
     <main className={`page product-page ${config.themeClass}`}>
@@ -38,7 +40,7 @@ export function LandingHero({ config }: { config: SimulatorConfig }) {
           <h1>{config.landing.headline}</h1>
           <p className="copy">{config.landing.subhead}</p>
           <div className="actions hero-actions">
-            <Link className="button" href={`/${config.slug}/start`}>
+            <Link className="button" href={`/${config.slug}/start${variantSearch}`}>
               {config.landing.cta}
             </Link>
             <Link className="button button-ghost" href={`/${alternate}`}>

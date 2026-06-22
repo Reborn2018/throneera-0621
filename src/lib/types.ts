@@ -1,4 +1,6 @@
 export type SimulatorSlug = "queen" | "napoleon";
+export type QueenVariantId = "legacy" | "crown" | "betrayal";
+export type SimulatorVariantId = QueenVariantId | "default";
 
 export type RunStatus =
   | "identity"
@@ -57,6 +59,8 @@ export interface SimulatorOffer {
 
 export interface SimulatorConfig {
   slug: SimulatorSlug;
+  variantId?: SimulatorVariantId;
+  experimentId?: string;
   title: string;
   themeClass: string;
   landing: {
@@ -70,10 +74,19 @@ export interface SimulatorConfig {
     dispositions: IdentityOption[];
     origins: IdentityOption[];
   };
+  identityIntro?: {
+    heading: string;
+    copy: string;
+  };
   realmLabels: Record<RealmKey, string>;
   initialRealm: RealmState;
   prologueScenes: StoryScene[];
   paidScenes: StoryScene[];
+  paywall?: {
+    crisis: string;
+    loss: string;
+    cta: string;
+  };
   endings: {
     totalSlots: number;
     titles: string[];
@@ -105,6 +118,7 @@ export interface RunRecord {
     name: string;
     dispositionId: string;
     originId: string;
+    variantId?: SimulatorVariantId;
   };
   realm: RealmState;
   decisions: RunDecision[];

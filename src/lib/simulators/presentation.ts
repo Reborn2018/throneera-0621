@@ -1,4 +1,5 @@
-import type { SimulatorConfig, SimulatorSlug } from "@/lib/types";
+import type { QueenVariantId, SimulatorConfig, SimulatorSlug } from "@/lib/types";
+import { normalizeQueenVariant } from "@/lib/variants";
 
 export interface SimulatorVisuals {
   heroImage: string;
@@ -27,6 +28,34 @@ export const simulatorVisuals: Record<SimulatorSlug, SimulatorVisuals> = {
     switchLabel: "Try Queen Simulator",
   },
 };
+
+export const queenVariantVisuals: Record<QueenVariantId, SimulatorVisuals> = {
+  legacy: simulatorVisuals.queen,
+  crown: {
+    heroImage: "/assets/hero-queen.png",
+    heroAlt: "A queen in a candlelit throne room with a crown and royal court atmosphere.",
+    kicker: "Stolen Crown",
+    promise: "Your sister has the throne. You have one public moment to make the court choose.",
+    proof: "Built to test legality, humiliation, sister rivalry, revenge, and public power.",
+    switchLabel: "Try Napoleon Simulator",
+  },
+  betrayal: {
+    heroImage: "/assets/hero-queen.png",
+    heroAlt: "A queen in a candlelit throne room with a crown and royal court atmosphere.",
+    kicker: "Marriage Betrayal",
+    promise: "Your husband brought another woman and an abdication paper to dinner.",
+    proof: "Built to test intimate betrayal, heir panic, identity threat, and revenge.",
+    switchLabel: "Try Napoleon Simulator",
+  },
+};
+
+export function getSimulatorVisuals(config: SimulatorConfig): SimulatorVisuals {
+  if (config.slug === "queen") {
+    return queenVariantVisuals[normalizeQueenVariant(config.variantId)];
+  }
+
+  return simulatorVisuals[config.slug];
+}
 
 export function getStoryTurnCount(config: SimulatorConfig): number {
   return config.prologueScenes.length + config.paidScenes.length;

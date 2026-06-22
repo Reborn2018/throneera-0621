@@ -246,7 +246,7 @@ describe("checkout engine", () => {
     expect(createCheckout).toHaveBeenCalledWith({
       productId,
       requestId: "request-1",
-      successUrl: "https://throneera.com/queen/return?runId=run-1",
+      successUrl: "https://throneera.com/queen/return?runId=run-1&variant=legacy",
       metadata: {
         runId: "run-1",
         simulator: "queen",

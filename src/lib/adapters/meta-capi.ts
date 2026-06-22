@@ -14,6 +14,8 @@ export interface MetaPurchaseInput {
   value: number;
   currency: "USD";
   sku: string;
+  variantId?: string;
+  experimentId?: string;
   userData?: {
     clientIpAddress?: string;
     clientUserAgent?: string;
@@ -55,6 +57,8 @@ export function createMetaCapiClient(options: MetaCapiClientOptions): MetaCapiCl
               order_id: input.orderId,
               content_ids: [input.sku],
               content_type: "product",
+              ...(input.variantId ? { variant_id: input.variantId } : {}),
+              ...(input.experimentId ? { experiment_id: input.experimentId } : {}),
             },
           },
         ],

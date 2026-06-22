@@ -1,6 +1,7 @@
 import { createMetaCapiClient } from "@/lib/adapters/meta-capi";
 import type { RunStore } from "@/lib/adapters/store";
 import type { OrderRecord } from "@/lib/types";
+import { runVariantPayload } from "@/lib/variants";
 
 interface MetaPurchaseOptions {
   order: OrderRecord;
@@ -24,9 +25,11 @@ export async function sendMetaPurchaseIfConfigured({
   if (!run) {
     return;
   }
+  const variantPayload = runVariantPayload(run);
 
   const sourceUrl = new URL(`/${run.simulator}/return`, siteUrl);
   sourceUrl.searchParams.set("runId", order.runId);
+  sourceUrl.searchParams.set("variant", variantPayload.variant_id);
 
   await createMetaCapiClient({
     pixelId,
@@ -39,6 +42,8 @@ export async function sendMetaPurchaseIfConfigured({
     value: order.amountMinor / 100,
     currency: order.currency,
     sku: order.sku,
+    variantId: variantPayload.variant_id,
+    experimentId: variantPayload.experiment_id,
     testEventCode: process.env.META_TEST_EVENT_CODE,
   });
 }

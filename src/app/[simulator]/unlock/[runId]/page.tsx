@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { Paywall } from "@/components/paywall";
 import { isSimulatorSlug, getSimulatorConfig } from "@/lib/simulators";
 import { getStore } from "@/lib/server/store";
+import { getRunVariantId } from "@/lib/variants";
 
 export default async function UnlockPage({
   params,
@@ -19,7 +20,7 @@ export default async function UnlockPage({
     notFound();
   }
 
-  const config = getSimulatorConfig(simulator);
+  const config = getSimulatorConfig(simulator, getRunVariantId(run));
 
   return <Paywall config={config} run={run} />;
 }

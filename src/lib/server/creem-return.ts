@@ -4,6 +4,7 @@ import { applyCheckoutCompleted } from "@/lib/engine/checkout";
 import { sendMetaPurchaseIfConfigured } from "@/lib/server/meta-purchase";
 import { getSimulatorConfig } from "@/lib/simulators";
 import type { RunRecord } from "@/lib/types";
+import { getRunVariantId } from "@/lib/variants";
 
 interface CreemReturnOptions {
   store: RunStore;
@@ -21,7 +22,7 @@ export async function syncCreemReturnEntitlement(
     return options.run;
   }
 
-  const offer = getSimulatorConfig(options.run.simulator).offer;
+  const offer = getSimulatorConfig(options.run.simulator, getRunVariantId(options.run)).offer;
   const order = await options.store.findOpenOrder(options.run.id, offer.sku);
   if (!order || order.provider !== "creem") {
     return options.run;

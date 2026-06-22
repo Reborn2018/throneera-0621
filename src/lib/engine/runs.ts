@@ -3,6 +3,7 @@ import type { RunStore } from "@/lib/adapters/store";
 import { addMinutes, hashRestoreToken } from "@/lib/engine/restore";
 import { findChoice, getCurrentScene, getNextScene } from "@/lib/engine/scenes";
 import { getSimulatorConfig } from "@/lib/simulators";
+import { appendRunFunnelEvent } from "@/lib/analytics";
 import type {
   RealmState,
   RestoreTokenRecord,
@@ -10,6 +11,7 @@ import type {
   RunRecord,
   SimulatorSlug,
 } from "@/lib/types";
+import { getRunVariantId, normalizeQueenVariant } from "@/lib/variants";
 
 type Clock = () => Date;
 
@@ -23,6 +25,7 @@ interface CreateRunOptions extends EngineOptions {
   runId?: string;
   runType?: RunRecord["runType"];
   sourceRunId?: string;
+  variantId?: unknown;
 }
 
 interface SubmitIdentityOptions extends EngineOptions {
@@ -56,7 +59,9 @@ const defaultNow: Clock = () => new Date();
 
 export async function createRun(options: CreateRunOptions): Promise<RunRecord> {
   const now = (options.now ?? defaultNow)().toISOString();
-  const config = getSimulatorConfig(options.simulator);
+  const variantId =
+    options.simulator === "queen" ? normalizeQueenVariant(options.variantId) : "default";
+  const config = getSimulatorConfig(options.simulator, variantId);
   const run: RunRecord = {
     id: options.runId ?? nanoid(),
     simulator: options.simulator,
@@ -68,6 +73,7 @@ export async function createRun(options: CreateRunOptions): Promise<RunRecord> {
       name: config.identity.defaultName,
       dispositionId: config.identity.dispositions[0]?.id ?? "default",
       originId: config.identity.origins[0]?.id ?? "default",
+      variantId,
     },
     realm: { ...config.initialRealm },
     decisions: [],
@@ -76,12 +82,13 @@ export async function createRun(options: CreateRunOptions): Promise<RunRecord> {
   };
 
   await options.store.saveRun(run);
+  await appendRunFunnelEvent(options.store, run, "run_created");
   return run;
 }
 
 export async function submitIdentity(options: SubmitIdentityOptions): Promise<RunRecord> {
   const run = await requireRun(options.store, options.runId);
-  const config = getSimulatorConfig(run.simulator);
+  const config = getSimulatorConfig(run.simulator, getRunVariantId(run));
   const disposition = config.identity.dispositions.find(
     (candidate) => candidate.id === options.dispositionId,
   );
@@ -100,7 +107,7 @@ export async function submitIdentity(options: SubmitIdentityOptions): Promise<Ru
     throw new Error(`Simulator has no prologue scenes: ${run.simulator}`);
   }
 
-  return options.store.updateRun(options.runId, (current) => ({
+  const updated = await options.store.updateRun(options.runId, (current) => ({
     ...current,
     status: "prologue",
     currentSceneId: firstScene.id,
@@ -108,9 +115,15 @@ export async function submitIdentity(options: SubmitIdentityOptions): Promise<Ru
       name: options.name.trim() || config.identity.defaultName,
       dispositionId: disposition.id,
       originId: origin.id,
+      variantId: current.identity.variantId,
     },
     updatedAt: (options.now ?? defaultNow)().toISOString(),
   }));
+
+  await appendRunFunnelEvent(options.store, updated, "free_content_started", {
+    scene_id: firstScene.id,
+  });
+  return updated;
 }
 
 export async function submitChoice(options: SubmitChoiceOptions): Promise<RunRecord> {
@@ -146,7 +159,7 @@ export async function submitChoice(options: SubmitChoiceOptions): Promise<RunRec
 
   const nextRealm = applyRealmDelta(run.realm, choice.delta ?? {});
 
-  return options.store.updateRun(options.runId, (current) => ({
+  const updated = await options.store.updateRun(options.runId, (current) => ({
     ...current,
     status: nextStatus(current.status, nextScene),
     currentSceneId: nextScene?.id ?? scene.id,
@@ -156,6 +169,26 @@ export async function submitChoice(options: SubmitChoiceOptions): Promise<RunRec
     completedAt:
       current.status === "paid" && !nextScene ? now : current.completedAt,
   }));
+
+  await appendRunFunnelEvent(options.store, updated, "choice_submitted", {
+    scene_id: scene.id,
+    choice_id: choice.id,
+    choice_intent: choice.intent,
+  });
+
+  if (updated.status === "paywalled") {
+    await appendRunFunnelEvent(options.store, updated, "paywall_view", {
+      scene_id: scene.id,
+    });
+  }
+
+  if (updated.status === "completed") {
+    await appendRunFunnelEvent(options.store, updated, "ending_reached", {
+      scene_id: scene.id,
+    });
+  }
+
+  return updated;
 }
 
 export async function createReplayRun(options: CreateReplayOptions): Promise<RunRecord> {
@@ -170,6 +203,8 @@ export async function createReplayRun(options: CreateReplayOptions): Promise<Run
     runId: options.runId,
     runType: "replay",
     sourceRunId: sourceRun.id,
+    variantId:
+      sourceRun.simulator === "queen" ? normalizeQueenVariant(sourceRun.identity.variantId) : undefined,
     now: options.now,
   });
 }

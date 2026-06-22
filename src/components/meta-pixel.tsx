@@ -27,12 +27,13 @@ export function MetaPixel({ pixelId }: { pixelId?: string }) {
 
     window.fbq("track", "PageView");
 
-    const routeEvent = getMetaPixelRouteEvent(pathname);
+    const variantId = new URLSearchParams(window.location.search).get("variant") ?? undefined;
+    const routeEvent = getMetaPixelRouteEvent(pathname, variantId);
     if (!routeEvent) {
       return;
     }
 
-    const storageKey = `throneera:meta:${pathname}:${routeEvent.name}`;
+    const storageKey = `throneera:meta:${pathname}:${variantId ?? "default"}:${routeEvent.name}`;
     if (window.sessionStorage.getItem(storageKey)) {
       return;
     }

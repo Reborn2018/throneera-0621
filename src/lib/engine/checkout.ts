@@ -4,8 +4,10 @@ import type { CheckoutSession } from "@/lib/adapters/checkout";
 import { createMockCheckoutUrl } from "@/lib/adapters/checkout";
 import type { CreemCheckoutProvider } from "@/lib/adapters/creem";
 import type { RunStore } from "@/lib/adapters/store";
+import { appendRunFunnelEvent } from "@/lib/analytics";
 import { getSimulatorConfig } from "@/lib/simulators";
 import type { OrderRecord, RunRecord } from "@/lib/types";
+import { getRunVariantId, runVariantPayload } from "@/lib/variants";
 
 type Clock = () => Date;
 const defaultNow: Clock = () => new Date();
@@ -53,9 +55,15 @@ export async function createCheckoutForRun(options: CheckoutOptions): Promise<Ch
     throw new Error(`Run is not ready for checkout: ${run.status}`);
   }
 
-  const offer = getSimulatorConfig(run.simulator).offer;
+  const offer = getSimulatorConfig(run.simulator, getRunVariantId(run)).offer;
   const existing = await options.store.findOpenOrder(run.id, offer.sku);
   if (existing) {
+    await appendRunFunnelEvent(options.store, run, "checkout_started", {
+      order_id: existing.id,
+      provider: existing.provider,
+      checkout_status: existing.status,
+      reused_checkout: true,
+    });
     return {
       order: existing,
       checkoutUrl: checkoutUrlForOrder(existing),
@@ -85,6 +93,11 @@ export async function createCheckoutForRun(options: CheckoutOptions): Promise<Ch
       status: "checkout_pending",
       updatedAt: now,
     }));
+    await appendRunFunnelEvent(options.store, run, "checkout_started", {
+      order_id: order.id,
+      provider: order.provider,
+      checkout_status: order.status,
+    });
 
     return {
       order,
@@ -98,6 +111,7 @@ export async function createCheckoutForRun(options: CheckoutOptions): Promise<Ch
 
   const successUrl = new URL(`/${run.simulator}/return`, options.siteUrl);
   successUrl.searchParams.set("runId", run.id);
+  successUrl.searchParams.set("variant", runVariantPayload(run).variant_id);
   const externalCheckout = await options.checkoutProvider.createCheckout({
     productId: options.providerProductId,
     requestId: options.requestId,
@@ -130,6 +144,11 @@ export async function createCheckoutForRun(options: CheckoutOptions): Promise<Ch
     status: "checkout_pending",
     updatedAt: now,
   }));
+  await appendRunFunnelEvent(options.store, run, "checkout_started", {
+    order_id: order.id,
+    provider: order.provider,
+    checkout_status: order.status,
+  });
 
   return {
     order,
@@ -161,7 +180,7 @@ export async function applyCheckoutCompleted(
   });
 
   const run = await requireRun(options.store, order.runId);
-  const config = getSimulatorConfig(run.simulator);
+  const config = getSimulatorConfig(run.simulator, getRunVariantId(run));
   const firstPaidScene = config.paidScenes[0];
   if (!firstPaidScene) {
     throw new Error(`Simulator has no paid scenes: ${run.simulator}`);
@@ -202,6 +221,22 @@ export async function applyCheckoutCompleted(
     paidAt: current.paidAt ?? now,
     updatedAt: now,
   }));
+
+  if (order.status !== "completed") {
+    const updatedRun = await requireRun(options.store, order.runId);
+    await appendRunFunnelEvent(options.store, updatedRun, "purchase_completed", {
+      order_id: completedOrder.id,
+      provider: completedOrder.provider,
+      provider_order_id: completedOrder.providerOrderId ?? "",
+      amount_minor: completedOrder.amountMinor,
+      currency: completedOrder.currency,
+      sku: completedOrder.sku,
+    });
+    await appendRunFunnelEvent(options.store, updatedRun, "paid_content_started", {
+      scene_id: firstPaidScene.id,
+      order_id: completedOrder.id,
+    });
+  }
 
   return completedOrder;
 }
@@ -250,6 +285,13 @@ export async function applyRefundOrDispute(options: RefundWebhookOptions): Promi
     status: options.status,
     updatedAt: now,
   }));
+
+  const updatedRun = await requireRun(options.store, order.runId);
+  await appendRunFunnelEvent(options.store, updatedRun, options.status, {
+    order_id: order.id,
+    provider: order.provider,
+    provider_order_id: order.providerOrderId ?? "",
+  });
 }
 
 export async function hasActiveRunEntitlement(options: EntitlementOptions): Promise<boolean> {

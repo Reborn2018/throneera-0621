@@ -2,6 +2,7 @@ import Link from "next/link";
 import { BrandHeader } from "@/components/brand-header";
 import { LegalLinks } from "@/components/legal-links";
 import type { RunRecord, SimulatorSlug } from "@/lib/types";
+import { variantUrlForRun } from "@/lib/variants";
 
 export function ReturnCard({
   simulator,
@@ -21,7 +22,7 @@ export function ReturnCard({
           signed webhook updates the server.
         </p>
         {run ? (
-          <Link className="button" href={`/${simulator}/play/${run.id}`}>
+          <Link className="button" href={variantUrlForRun(`/${simulator}/play/${run.id}`, run)}>
             Resume the Throne
           </Link>
         ) : (

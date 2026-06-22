@@ -2,9 +2,11 @@ import Link from "next/link";
 import type { RunRecord, SimulatorConfig } from "@/lib/types";
 import { BrandHeader } from "@/components/brand-header";
 import { LegalLinks } from "@/components/legal-links";
+import { variantSearchForConfig } from "@/lib/variants";
 
 export function Ending({ config, run }: { config: SimulatorConfig; run: RunRecord }) {
   const title = config.endings.titles[0] ?? "A Reign Remembered";
+  const variantSearch = variantSearchForConfig(config);
 
   return (
     <main className={`page product-page ${config.themeClass}`}>
@@ -29,7 +31,7 @@ export function Ending({ config, run }: { config: SimulatorConfig; run: RunRecor
               {config.crossSell.headline}
             </button>
           </form>
-          <Link className="muted" href={`/${config.slug}/start`}>
+          <Link className="muted" href={`/${config.slug}/start${variantSearch}`}>
             Start a new route
           </Link>
         </div>

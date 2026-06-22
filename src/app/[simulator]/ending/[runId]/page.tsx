@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { Ending } from "@/components/ending";
 import { isSimulatorSlug, getSimulatorConfig } from "@/lib/simulators";
 import { getStore } from "@/lib/server/store";
+import { getRunVariantId } from "@/lib/variants";
 
 export default async function EndingPage({
   params,
@@ -19,7 +20,7 @@ export default async function EndingPage({
     notFound();
   }
 
-  const config = getSimulatorConfig(simulator);
+  const config = getSimulatorConfig(simulator, getRunVariantId(run));
 
   return <Ending config={config} run={run} />;
 }

@@ -4,6 +4,7 @@ import { createRun, submitIdentity } from "@/lib/engine/runs";
 import { isSimulatorSlug } from "@/lib/simulators";
 import { readRequestData, redirectResponse, wantsHtmlRedirect } from "@/lib/server/request";
 import { getStore } from "@/lib/server/store";
+import { getConfigVariantForSimulator, variantUrlForRun } from "@/lib/variants";
 
 const runSchema = z.object({
   simulator: z.string(),
@@ -11,6 +12,7 @@ const runSchema = z.object({
   dispositionId: z.string().optional(),
   originId: z.string().optional(),
   sourceRunId: z.string().optional(),
+  variantId: z.string().optional(),
 });
 
 export async function POST(request: Request) {
@@ -20,11 +22,13 @@ export async function POST(request: Request) {
   }
 
   const store = await getStore();
+  const variantId = getConfigVariantForSimulator(data.simulator, data.variantId);
   const run = await createRun({
     store,
     simulator: data.simulator,
     runType: data.sourceRunId ? "cross_sell" : "first_campaign",
     sourceRunId: data.sourceRunId,
+    variantId: data.simulator === "queen" ? variantId : undefined,
   });
 
   const withIdentity =
@@ -39,7 +43,10 @@ export async function POST(request: Request) {
       : run;
 
   if (wantsHtmlRedirect(request)) {
-    return redirectResponse(request, `/${withIdentity.simulator}/play/${withIdentity.id}`);
+    return redirectResponse(
+      request,
+      variantUrlForRun(`/${withIdentity.simulator}/play/${withIdentity.id}`, withIdentity),
+    );
   }
 
   return NextResponse.json({ run: withIdentity });

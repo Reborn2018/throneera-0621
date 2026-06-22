@@ -1,10 +1,20 @@
 import { expect, test } from "@playwright/test";
 
-async function startRun(page: import("@playwright/test").Page, simulator: "queen" | "napoleon") {
-  await page.goto(`/${simulator}`);
+type QueenVariant = "legacy" | "crown" | "betrayal";
+
+async function startRun(
+  page: import("@playwright/test").Page,
+  simulator: "queen" | "napoleon",
+  variant?: QueenVariant,
+) {
+  const path = simulator === "queen" && variant ? `/queen?variant=${variant}` : `/${simulator}`;
+  await page.goto(path);
   await page
     .getByRole("link", {
-      name: simulator === "queen" ? /claim the throne/i : /begin the campaign/i,
+      name:
+        simulator === "queen"
+          ? /claim the throne|take back the crown|refuse the abdication/i
+          : /begin the campaign/i,
     })
     .click();
   const responsePromise = page.waitForResponse(
@@ -15,7 +25,10 @@ async function startRun(page: import("@playwright/test").Page, simulator: "queen
   await page.waitForLoadState("domcontentloaded");
   await expect(
     page.getByRole("button", {
-      name: simulator === "queen" ? /protect/i : /serve France/i,
+      name:
+        simulator === "queen"
+          ? /protect|kneel slowly|lift your glass/i
+          : /serve France/i,
     }),
   ).toBeVisible();
 }
@@ -37,12 +50,44 @@ async function clickChoices(page: import("@playwright/test").Page, labels: RegEx
 
 test("Queen mobile free funnel reaches the current-run paywall", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await startRun(page, "queen");
+  await startRun(page, "queen", "legacy");
   await clickChoices(page, [/protect/i, /public trial/i, /break the seal/i, /torn envelope/i, /face the dawn/i]);
 
   await expect(page).toHaveURL(/\/queen\/unlock\//);
   await expect(page.getByRole("heading", { name: /complete your reign/i })).toBeVisible();
   await expect(page.getByText(/new campaigns and replays unlock separately/i)).toBeVisible();
+});
+
+test("Queen crown variant mobile free funnel reaches the current-run paywall", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await startRun(page, "queen", "crown");
+  await clickChoices(page, [
+    /kneel slowly/i,
+    /amnesty/i,
+    /address the crowd/i,
+    /borrow against/i,
+    /step over/i,
+  ]);
+
+  await expect(page).toHaveURL(/\/queen\/unlock\/.*variant=crown/);
+  await expect(page.getByRole("heading", { name: /complete your reign/i })).toBeVisible();
+  await expect(page.getByRole("button", { name: /reclaim my crown/i })).toBeVisible();
+});
+
+test("Queen betrayal variant mobile free funnel reaches the current-run paywall", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await startRun(page, "queen", "betrayal");
+  await clickChoices(page, [
+    /lift your glass/i,
+    /read every line/i,
+    /enter alone/i,
+    /burn the draft/i,
+    /enter the council/i,
+  ]);
+
+  await expect(page).toHaveURL(/\/queen\/unlock\/.*variant=betrayal/);
+  await expect(page.getByRole("heading", { name: /complete your reign/i })).toBeVisible();
+  await expect(page.getByRole("button", { name: /turn the betrayal back/i })).toBeVisible();
 });
 
 test("Napoleon mobile free funnel reaches the current-run paywall", async ({ page }) => {
@@ -55,7 +100,7 @@ test("Napoleon mobile free funnel reaches the current-run paywall", async ({ pag
 });
 
 test("mock checkout returns to the first paid Queen scene and refresh restores it", async ({ page }) => {
-  await startRun(page, "queen");
+  await startRun(page, "queen", "legacy");
   await clickChoices(page, [/protect/i, /public trial/i, /break the seal/i, /torn envelope/i, /face the dawn/i]);
 
   await page.getByRole("button", { name: /continue my reign/i }).click();
@@ -74,7 +119,7 @@ for (const viewport of [
 ]) {
   test(`Queen landing has no horizontal overflow at ${viewport.width}`, async ({ page }) => {
     await page.setViewportSize(viewport);
-    await page.goto("/queen");
+    await page.goto("/queen?variant=legacy");
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     );

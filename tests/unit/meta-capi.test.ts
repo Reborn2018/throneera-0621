@@ -29,6 +29,8 @@ describe("Meta CAPI adapter", () => {
               order_id: "provider-order-1",
               content_ids: ["complete_current_campaign"],
               content_type: "product",
+              variant_id: "crown",
+              experiment_id: "queen_offer_hook_2026_06_22",
             },
           },
         ],
@@ -55,6 +57,8 @@ describe("Meta CAPI adapter", () => {
         value: 7.99,
         currency: "USD",
         sku: "complete_current_campaign",
+        variantId: "crown",
+        experimentId: "queen_offer_hook_2026_06_22",
         userData: {
           clientIpAddress: "203.0.113.10",
           clientUserAgent: "Playwright",

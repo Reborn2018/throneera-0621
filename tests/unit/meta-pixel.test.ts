@@ -6,7 +6,21 @@ describe("Meta Pixel route events", () => {
     expect(getMetaPixelRouteEvent("/queen")).toEqual({
       name: "ViewContent",
       params: {
-        content_name: "throneera_queen_landing",
+        variant_id: "legacy",
+        experiment_id: "queen_offer_hook_2026_06_22",
+        content_name: "throneera_queen_legacy_landing",
+        content_category: "campaign_landing",
+      },
+    });
+  });
+
+  it("tracks Queen variants separately", () => {
+    expect(getMetaPixelRouteEvent("/queen", "crown")).toEqual({
+      name: "ViewContent",
+      params: {
+        variant_id: "crown",
+        experiment_id: "queen_offer_hook_2026_06_22",
+        content_name: "throneera_queen_crown_landing",
         content_category: "campaign_landing",
       },
     });
@@ -16,17 +30,21 @@ describe("Meta Pixel route events", () => {
     expect(getMetaPixelRouteEvent("/napoleon/play/run_123")).toEqual({
       name: "Lead",
       params: {
-        content_name: "throneera_napoleon_first_play",
+        variant_id: "default",
+        experiment_id: "default",
+        content_name: "throneera_napoleon_default_first_play",
         content_category: "campaign_started",
       },
     });
   });
 
   it("tracks paywall views as InitiateCheckout", () => {
-    expect(getMetaPixelRouteEvent("/queen/unlock/run_123")).toEqual({
+    expect(getMetaPixelRouteEvent("/queen/unlock/run_123", "betrayal")).toEqual({
       name: "InitiateCheckout",
       params: {
-        content_name: "throneera_queen_paywall",
+        variant_id: "betrayal",
+        experiment_id: "queen_offer_hook_2026_06_22",
+        content_name: "throneera_queen_betrayal_paywall",
         content_category: "campaign_unlock",
       },
     });

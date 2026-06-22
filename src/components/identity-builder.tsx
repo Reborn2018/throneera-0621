@@ -1,24 +1,28 @@
 import { BrandHeader } from "@/components/brand-header";
 import { LegalLinks } from "@/components/legal-links";
 import type { SimulatorConfig } from "@/lib/types";
-import { simulatorVisuals } from "@/lib/simulators/presentation";
+import { getSimulatorVisuals } from "@/lib/simulators/presentation";
 
 export function IdentityBuilder({ config }: { config: SimulatorConfig }) {
-  const visuals = simulatorVisuals[config.slug];
+  const visuals = getSimulatorVisuals(config);
   const noun = config.slug === "queen" ? "crown" : "command";
+  const introHeading = config.identityIntro?.heading ?? `Claim your ${noun} before history claims you.`;
+  const introCopy =
+    config.identityIntro?.copy ??
+    "Your first identity choices shape how the court, army, and public read every command that follows.";
 
   return (
     <main className={`page product-page ${config.themeClass}`}>
       <BrandHeader simulator={config.slug} />
       <section className="panel identity-panel">
         <p className="eyebrow">{visuals.kicker}</p>
-        <h1>Claim your {noun} before history claims you.</h1>
-        <p className="copy">
-          Your first identity choices shape how the court, army, and public read
-          every command that follows.
-        </p>
+        <h1>{introHeading}</h1>
+        <p className="copy">{introCopy}</p>
         <form className="form-grid" method="post" action="/api/runs">
           <input type="hidden" name="simulator" value={config.slug} />
+          {config.slug === "queen" ? (
+            <input type="hidden" name="variantId" value={config.variantId ?? "legacy"} />
+          ) : null}
           <label className="field-stack">
             <span className="field-label">{config.identity.nameLabel}</span>
             <input

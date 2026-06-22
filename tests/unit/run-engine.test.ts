@@ -55,6 +55,35 @@ describe("run engine", () => {
     });
   });
 
+  it("preserves the Queen variant through identity submission", async () => {
+    const store = createMemoryStore();
+    await createRun({
+      store,
+      simulator: "queen",
+      runId: "run-1",
+      variantId: "crown",
+      now: fixedNow,
+    });
+
+    const run = await submitIdentity({
+      store,
+      runId: "run-1",
+      name: "Aurelia",
+      dispositionId: "lawful",
+      originId: "true-heir",
+      now: fixedNow,
+    });
+
+    expect(run).toMatchObject({
+      status: "prologue",
+      currentSceneId: "crown-stolen",
+      identity: {
+        variantId: "crown",
+      },
+    });
+  });
+
+
   it("advances through the free prologue and stops at the paywall", async () => {
     const store = createMemoryStore();
     await createRun({ store, simulator: "queen", runId: "run-1", now: fixedNow });

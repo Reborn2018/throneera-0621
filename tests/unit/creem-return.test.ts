@@ -132,11 +132,13 @@ describe("Creem return sync", () => {
     });
     expect(mocks.sendPurchase).toHaveBeenCalledWith({
       eventId: "request-1",
-      sourceUrl: "https://throneera.com/queen/return?runId=run-1",
+      sourceUrl: "https://throneera.com/queen/return?runId=run-1&variant=legacy",
       orderId: "ord_123",
       value: 9.99,
       currency: "USD",
       sku: "complete_current_campaign",
+      variantId: "legacy",
+      experimentId: "queen_offer_hook_2026_06_22",
       testEventCode: undefined,
     });
   });

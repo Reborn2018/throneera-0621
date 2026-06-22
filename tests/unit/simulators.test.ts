@@ -8,6 +8,21 @@ describe("simulator configs", () => {
     expect(getSimulatorConfig("napoleon").slug).toBe("napoleon");
   });
 
+  it("selects Queen product variants without changing the paid offer", () => {
+    const legacy = getSimulatorConfig("queen", "legacy");
+    const crown = getSimulatorConfig("queen", "crown");
+    const betrayal = getSimulatorConfig("queen", "betrayal");
+
+    expect(legacy.landing.headline).toBe("Queen Simulator");
+    expect(crown.landing.headline).toMatch(/sister/i);
+    expect(betrayal.landing.headline).toMatch(/husband/i);
+    expect([legacy, crown, betrayal].map((config) => config.offer)).toEqual([
+      legacy.offer,
+      legacy.offer,
+      legacy.offer,
+    ]);
+  });
+
   it.each(["queen", "napoleon"] as const)(
     "gives %s enough authored structure for the MVP funnel",
     (slug) => {

@@ -1,9 +1,11 @@
 import { BrandHeader } from "@/components/brand-header";
+import { CreemEmbeddedCheckout } from "@/components/creem-embedded-checkout";
 import { LegalLinks } from "@/components/legal-links";
 import Image from "next/image";
 import Link from "next/link";
 import type { RunRecord, SimulatorConfig } from "@/lib/types";
 import { getFormattedPrice } from "@/lib/simulators/presentation";
+import { variantSearchForConfig } from "@/lib/variants";
 
 export function Paywall({ config, run }: { config: SimulatorConfig; run: RunRecord }) {
   const price = getFormattedPrice(config);
@@ -11,9 +13,16 @@ export function Paywall({ config, run }: { config: SimulatorConfig; run: RunReco
   const paidTurns = config.paidScenes.length;
   const noun = config.slug === "queen" ? "reign" : "campaign";
   const crisis =
-    config.slug === "queen"
+    config.paywall?.crisis ??
+    (config.slug === "queen"
       ? "The rebellion has found its banner. Your court is waiting to see whether you are sovereign or prey."
-      : "Europe is moving before dawn. Paris is waiting to see whether you are useful, dangerous, or inevitable.";
+      : "Europe is moving before dawn. Paris is waiting to see whether you are useful, dangerous, or inevitable.");
+  const loss = config.paywall?.loss ?? "Leave now and this crisis remains unresolved.";
+  const cta = config.paywall?.cta ?? `Continue My ${config.slug === "queen" ? "Reign" : "Campaign"}`;
+  const variantSearch = variantSearchForConfig(config);
+  const embeddedCheckoutEnabled =
+    process.env.VERCEL_ENV === "production" &&
+    process.env.THRONEERA_CREEM_EMBEDDED_CHECKOUT !== "false";
 
   return (
     <main className={`page product-page ${config.themeClass}`}>
@@ -26,9 +35,7 @@ export function Paywall({ config, run }: { config: SimulatorConfig; run: RunReco
         <div className="pw-seal" aria-hidden="true">
           <Image src="/assets/throne-era-logo.png" alt="" width={64} height={64} />
         </div>
-        <p className="pw-loss">
-          Leave now and this crisis remains unresolved.
-        </p>
+        <p className="pw-loss">{loss}</p>
         <h1>{config.offer.label}</h1>
         <p className="copy">
           Unlock the remaining {paidTurns} turns, carry your current choices forward,
@@ -39,12 +46,13 @@ export function Paywall({ config, run }: { config: SimulatorConfig; run: RunReco
           <strong className="pw-price">{price}</strong>
           <span>One-time unlock for this run</span>
         </div>
-        <form className="actions" method="post" action="/api/checkout">
-          <input type="hidden" name="runId" value={run.id} />
-          <button className="button" type="submit">
-            Continue My {config.slug === "queen" ? "Reign" : "Campaign"}
-          </button>
-        </form>
+        <CreemEmbeddedCheckout
+          runId={run.id}
+          simulator={config.slug}
+          variantSearch={variantSearch}
+          label={cta}
+          enabled={embeddedCheckoutEnabled}
+        />
 
         {decisions.length ? (
           <aside className="recap-card" aria-label={`Your ${noun} so far`}>
@@ -77,7 +85,7 @@ export function Paywall({ config, run }: { config: SimulatorConfig; run: RunReco
           <li>Unlock the full current campaign and ending</li>
           <li>Secure checkout, no subscription, refund support available</li>
         </ul>
-        <Link className="muted fine-print text-link" href={`/${config.slug}`}>
+        <Link className="muted fine-print text-link" href={`/${config.slug}${variantSearch}`}>
           Return later
         </Link>
         <p className="muted fine-print">
