@@ -8,6 +8,7 @@ export interface SimulatorVisuals {
   promise: string;
   proof: string;
   switchLabel: string;
+  trust: [string, string, string, string];
 }
 
 export const simulatorVisuals: Record<SimulatorSlug, SimulatorVisuals> = {
@@ -18,14 +19,16 @@ export const simulatorVisuals: Record<SimulatorSlug, SimulatorVisuals> = {
     promise: "Every decree changes loyalty, fear, and the survival of your crown.",
     proof: "Built for a dramatic, choice-driven reign with a personalized ending.",
     switchLabel: "Try Napoleon Simulator",
+    trust: ["Public humiliation", "Dangerous choices", "The court remembers", "No account needed"],
   },
   napoleon: {
     heroImage: "/assets/hero-napoleon.png",
     heroAlt: "Napoleon at a campaign map table with imperial war-room lighting.",
-    kicker: "Campaign Map Room",
-    promise: "Every order changes authority, supply, army morale, and public will.",
-    proof: "Built for a strategic, choice-driven campaign with a personalized ending.",
+    kicker: "Paris Watches",
+    promise: "Every order changes authority, supply, army morale, and the public myth forming around your name.",
+    proof: "Built for a tense, choice-driven campaign where ministers, soldiers, and Europe react to your route.",
     switchLabel: "Try Queen Simulator",
+    trust: ["Paris watches", "Europe reacts", "The army remembers", "No account needed"],
   },
 };
 
@@ -38,6 +41,7 @@ export const queenVariantVisuals: Record<QueenVariantId, SimulatorVisuals> = {
     promise: "Your sister has the throne. You have one public moment to make the court choose.",
     proof: "Built to test legality, humiliation, sister rivalry, revenge, and public power.",
     switchLabel: "Try Napoleon Simulator",
+    trust: ["Public humiliation", "Dangerous choices", "The court remembers", "No account needed"],
   },
   betrayal: {
     heroImage: "/assets/hero-queen-betrayal-v2.png",
@@ -46,6 +50,7 @@ export const queenVariantVisuals: Record<QueenVariantId, SimulatorVisuals> = {
     promise: "Your husband brought another woman and an abdication paper to dinner.",
     proof: "Built to test intimate betrayal, heir panic, identity threat, and revenge.",
     switchLabel: "Try Napoleon Simulator",
+    trust: ["Public betrayal", "Dangerous choices", "The court remembers", "No account needed"],
   },
 };
 

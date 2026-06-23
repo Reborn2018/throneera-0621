@@ -159,6 +159,20 @@ function getPaywallPitch(
     };
   }
 
+  if (config.slug === "napoleon") {
+    return {
+      kicker: "Paris will use you until you become necessary",
+      headline: "Do not let Paris own your legend.",
+      lead: `${run.identity.name}, your first orders have already reached the ministers. Continue this exact campaign to decide whether France remembers a loyal general, a dangerous savior, or the man who made Europe move around him.`,
+      proof: [
+        "Carry forward your exact orders, authority, supply, army, and public will",
+        "Resolve the Austrian crisis before Paris writes you out of command",
+        `Reveal a personalized ${endingNoun} shaped by your route to power`,
+      ],
+      stakes: "Stop here and the Directory keeps the story while your army becomes someone else's instrument.",
+    };
+  }
+
   return {
     kicker: "Your campaign is still unresolved",
     headline: config.offer.label,

@@ -7,8 +7,13 @@ export const napoleonConfig: SimulatorConfig = {
   landing: {
     headline: "Napoleon Simulator",
     subhead:
-      "Take command of France, choose ambition or restraint, and find out whether Europe remembers you as savior, emperor, or disaster.",
-    cta: "Begin the Campaign",
+      "Paris expects a useful general. Europe is moving before dawn. Issue the first orders, decide whether you serve the Republic or crown your own legend, and see if the map bends before the politicians betray you.",
+    cta: "Seize the Campaign",
+  },
+  identityIntro: {
+    heading: "Enter the map room before Paris chooses a safer man.",
+    copy:
+      "Your first posture decides whether officers hear a loyal servant, a future emperor, or the only man moving fast enough to survive the coming war.",
   },
   identity: {
     nameLabel: "Your command name",
@@ -63,11 +68,11 @@ export const napoleonConfig: SimulatorConfig = {
   prologueScenes: [
     {
       id: "commission",
-      title: "The First Commission",
+      title: "Paris Is Watching",
       act: "The Republic Watches",
       narration: [
-        "Paris has given you a command that more senior men refused. The city expects failure and needs a victory.",
-        "Your first words to the officers will decide whether they hear a soldier, a politician, or an emperor in waiting.",
+        "Paris has given you the command senior men refused. The ministers expect you to be useful, temporary, and easy to replace.",
+        "Your first words to the officers will decide whether they hear a servant of the Republic, a politician with a sword, or an emperor before the crown exists.",
       ],
       choices: [
         {
@@ -360,6 +365,13 @@ export const napoleonConfig: SimulatorConfig = {
       "The Treaty Maker",
       "The Map Breaker",
     ],
+  },
+  paywall: {
+    crisis:
+      "A courier from Paris waits outside the map room. If you hesitate, the Directory will replace you before Austria does.",
+    loss:
+      "Leave now and Paris owns the dispatch, Austria owns the field, and your name returns to the margins.",
+    cta: "Seize My Campaign",
   },
   offer: {
     sku: "complete_current_campaign",

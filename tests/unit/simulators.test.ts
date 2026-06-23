@@ -29,7 +29,7 @@ describe("simulator configs", () => {
       const config = getSimulatorConfig(slug);
 
       expect(config.landing.headline.length).toBeGreaterThan(10);
-      expect(config.landing.cta).toMatch(/start|begin|claim|rise|rule/i);
+      expect(config.landing.cta).toMatch(/start|begin|claim|rise|rule|seize/i);
       expect(config.identity.dispositions).toHaveLength(3);
       expect(config.identity.origins).toHaveLength(3);
       expect(config.prologueScenes.length).toBeGreaterThanOrEqual(5);

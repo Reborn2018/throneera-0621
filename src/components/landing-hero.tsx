@@ -8,8 +8,6 @@ import { variantSearchForConfig } from "@/lib/variants";
 
 export function LandingHero({ config }: { config: SimulatorConfig }) {
   const visuals = getSimulatorVisuals(config);
-  const showAlternateCampaign = config.slug !== "queen";
-  const alternate = showAlternateCampaign ? config.crossSell.target : null;
   const variantSearch = variantSearchForConfig(config);
   const variantClass = config.variantId ? `variant-${config.variantId}` : "";
 
@@ -39,21 +37,15 @@ export function LandingHero({ config }: { config: SimulatorConfig }) {
             <Link className="button" href={`/${config.slug}/start${variantSearch}`}>
               {config.landing.cta}
             </Link>
-            {alternate ? (
-              <Link className="button button-ghost" href={`/${alternate}`}>
-                {visuals.switchLabel}
-              </Link>
-            ) : null}
           </div>
           <p className="conversion-line">Begin inside the crisis. No account needed.</p>
         </div>
       </section>
       <section className="landing-support" aria-label="Story tension">
         <div className="trust-strip">
-          <span>Public humiliation</span>
-          <span>Dangerous choices</span>
-          <span>The court remembers</span>
-          <span>No account needed</span>
+          {visuals.trust.map((item) => (
+            <span key={item}>{item}</span>
+          ))}
         </div>
         <div className="landing-proof">
           <p>{visuals.promise}</p>

@@ -20,7 +20,7 @@ async function startRun(
       name:
         simulator === "queen"
           ? /claim the throne|take back the crown|refuse the abdication/i
-          : /begin the campaign/i,
+          : /begin the campaign|seize the campaign/i,
     })
     .click();
   const responsePromise = page.waitForResponse(
@@ -78,6 +78,20 @@ test("Queen ad funnel hides Napoleon entry points before paywall", async ({ page
   await expect(page.getByRole("link", { name: /napoleon/i })).toHaveCount(0);
 });
 
+test("Napoleon ad funnel hides Queen entry points before paywall", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/napoleon");
+  await expect(page.getByRole("link", { name: /queen/i })).toHaveCount(0);
+  await expect(page.getByText(/Try Queen Simulator/i)).toHaveCount(0);
+
+  await page.getByRole("link", { name: /seize the campaign/i }).click();
+  await expect(page.getByRole("link", { name: /queen/i })).toHaveCount(0);
+
+  await page.getByRole("button", { name: /begin the first turn/i }).click();
+  await expect(page.getByRole("button", { name: /serve France/i })).toBeVisible();
+  await expect(page.getByRole("link", { name: /queen/i })).toHaveCount(0);
+});
+
 for (const variant of ["legacy", "crown", "betrayal"] as const) {
   test(`Queen ${variant} landing keeps price and story length hidden`, async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
@@ -87,6 +101,15 @@ for (const variant of ["legacy", "crown", "betrayal"] as const) {
     await expect(page.getByText(/begin inside the crisis/i)).toBeVisible();
   });
 }
+
+test("Napoleon landing keeps price, story length, and alternate product hidden", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/napoleon");
+
+  await expect(page.getByText(/\$5\.99|full campaign|free turns|total story turns|endings/i)).toHaveCount(0);
+  await expect(page.getByText(/Europe reacts/i)).toBeVisible();
+  await expect(page.getByText(/Try Queen Simulator/i)).toHaveCount(0);
+});
 
 test("Meta pixel fires InitiateCheckout only after the checkout button click", async ({ page }) => {
   const fbqCalls: unknown[][] = [];
@@ -155,7 +178,8 @@ test("Napoleon mobile free funnel reaches the current-run paywall", async ({ pag
   await clickChoices(page, [/serve France/i, /turn their flank/i, /pocket the dispatch/i, /listen without answering/i, /take command/i]);
 
   await expect(page).toHaveURL(/\/napoleon\/unlock\//);
-  await expect(page.getByRole("heading", { name: /complete your campaign/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /do not let paris own your legend/i })).toBeVisible();
+  await expect(page.getByRole("button", { name: /seize my campaign/i })).toBeVisible();
 });
 
 test("mock checkout returns to the first paid Queen scene and refresh restores it", async ({ page }) => {
