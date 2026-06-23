@@ -20,7 +20,7 @@ export function Paywall({ config, run }: { config: SimulatorConfig; run: RunReco
   const cta = config.paywall?.cta ?? `Continue My ${config.slug === "queen" ? "Reign" : "Campaign"}`;
   const endingNoun = config.slug === "queen" ? "ending" : "finale";
   const pitch = getPaywallPitch(config, run, endingNoun);
-  const unlockLabel = config.slug === "queen" ? "Finish this reign" : "Complete this campaign";
+  const unlockLabel = config.slug === "queen" ? "Finish this reign" : "Unlock this campaign";
   const variantSearch = variantSearchForConfig(config);
   const embeddedCheckoutEnabled =
     process.env.VERCEL_ENV === "production" &&
@@ -58,7 +58,7 @@ export function Paywall({ config, run }: { config: SimulatorConfig; run: RunReco
             <span className="pw-price-kicker">{unlockLabel}</span>
             <strong className="pw-price">{price}</strong>
           </div>
-          <span>One-time unlock for this saved story. No subscription.</span>
+          <span>One-time payment. No subscription.</span>
         </div>
 
         <div className="pw-reassurance" aria-label="Checkout reassurance">

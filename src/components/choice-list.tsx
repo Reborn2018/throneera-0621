@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 import type { SceneChoice, SimulatorConfig, StoryScene } from "@/lib/types";
 
 const IMPACT_DELAY_MS = 1350;
+const NAPOLEON_IMPACT_DELAY_MS = 1180;
 
 interface ChoiceImpact {
   id: string;
@@ -42,16 +43,16 @@ export function ChoiceList({
 
     window.setTimeout(() => {
       form.submit();
-    }, IMPACT_DELAY_MS);
+    }, config.slug === "napoleon" ? NAPOLEON_IMPACT_DELAY_MS : IMPACT_DELAY_MS);
   }
 
   const hasImpact = Boolean(impact);
-  const headline = config.slug === "queen" ? "The court changes" : "History rewritten";
-  const seal = config.slug === "queen" ? "Royal seal struck" : "Order carried";
+  const headline = config.slug === "queen" ? "The court changes" : "The map moves";
+  const seal = config.slug === "queen" ? "Royal seal struck" : "Dispatch carried";
   const transit =
     config.slug === "queen"
       ? "Your command is moving through the hall."
-      : "Your command is moving across the map.";
+      : "Your command is already moving across the map.";
   const routeHint =
     config.slug === "queen"
       ? "This answer is now part of your route. Another command would bend the court toward a different fate."

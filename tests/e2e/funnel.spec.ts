@@ -61,7 +61,7 @@ test("Queen mobile free funnel reaches the current-run paywall", async ({ page }
 
   await expect(page).toHaveURL(/\/queen\/unlock\//);
   await expect(page.getByRole("heading", { name: /finish the reign your choices started/i })).toBeVisible();
-  await expect(page.getByText(/one-time unlock for this saved story/i)).toBeVisible();
+  await expect(page.getByText(/one-time payment\. no subscription/i)).toBeVisible();
 });
 
 test("Queen ad funnel hides Napoleon entry points before paywall", async ({ page }) => {
