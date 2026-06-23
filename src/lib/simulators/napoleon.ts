@@ -363,7 +363,7 @@ export const napoleonConfig: SimulatorConfig = {
   },
   offer: {
     sku: "complete_current_campaign",
-    amountMinor: 799,
+    amountMinor: 599,
     currency: "USD",
     label: "Complete Your Campaign",
   },

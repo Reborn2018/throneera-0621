@@ -83,7 +83,7 @@ for (const variant of ["legacy", "crown", "betrayal"] as const) {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(`/queen?variant=${variant}`);
 
-    await expect(page.getByText(/\$7\.99|full campaign|free turns|total story turns|endings/i)).toHaveCount(0);
+    await expect(page.getByText(/\$5\.99|full campaign|free turns|total story turns|endings/i)).toHaveCount(0);
     await expect(page.getByText(/begin inside the crisis/i)).toBeVisible();
   });
 }

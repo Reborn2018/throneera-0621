@@ -19,7 +19,7 @@
 
 - 序章结束前完成四个价值事件：建立身份、不可逆决定、个性化后果、重大危机。
 - 付费墙只出售当前 Queen 的完整统治，不出售回合、token、章节碎片或订阅。
-- 默认仅展示 `Complete Your Reign — $7.99`。
+- 默认仅展示 `Complete Your Reign — $5.99`。
 - 必须回调本场用户的 Queen 名字、统治风格、第一道王命和当前危机。
 
 ### 结局升级
@@ -30,7 +30,7 @@
 2. 可分享的统治摘要卡。
 3. `Endings unlocked · 1 of 5` 未完成感。
 4. New Game+ 个性化文案。
-5. `Queen Collection — $14.99`，已付用户仅补 `$7.00`。
+5. `Queen Collection — $14.99`，已付用户仅补 `$9.00`。
 6. 可选 Napoleon Simulator 交叉推广。
 7. 所有用户可见的重玩入口。
 

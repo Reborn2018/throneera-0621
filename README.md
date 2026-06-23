@@ -67,7 +67,7 @@ Production must not enable `THRONEERA_ALLOW_MOCK_CHECKOUT`.
 - Production storage uses Supabase when `SUPABASE_URL` and
   `SUPABASE_SERVICE_ROLE_KEY` are configured.
 
-The base SKU is `complete_current_campaign` at `$7.99`, scoped to one run.
+The base SKU is `complete_current_campaign` at `$5.99`, scoped to one run.
 Replay and cross-sell create new runs without carrying paid entitlement.
 
 ## Database
