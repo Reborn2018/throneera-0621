@@ -1,22 +1,16 @@
 import { notFound } from "next/navigation";
-import { LandingHero } from "@/components/landing-hero";
-import { getSimulatorConfig, isSimulatorSlug } from "@/lib/simulators";
-import { getConfigVariantForSimulator } from "@/lib/variants";
+import ThroneEraGame from "@/components/ThroneEraGame";
+import { isSimulatorSlug } from "@/lib/simulators";
 
 export default async function SimulatorLandingPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ simulator: string }>;
-  searchParams: Promise<{ variant?: string }>;
 }) {
   const { simulator } = await params;
-  const { variant } = await searchParams;
   if (!isSimulatorSlug(simulator)) {
     notFound();
   }
 
-  const config = getSimulatorConfig(simulator, getConfigVariantForSimulator(simulator, variant));
-
-  return <LandingHero config={config} />;
+  return <ThroneEraGame era={simulator} />;
 }

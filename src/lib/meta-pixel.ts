@@ -43,6 +43,17 @@ export function getMetaPixelRouteEvent(
     };
   }
 
+  if (segments[1] === "play" && segments.length === 2) {
+    return {
+      name: "ViewContent",
+      params: {
+        ...baseParams,
+        content_name: `${contentName}_landing`,
+        content_category: "campaign_landing",
+      },
+    };
+  }
+
   if (segments[1] === "play") {
     return {
       name: "Lead",
