@@ -1,4 +1,4 @@
-# ThroneEra — Codex production handoff
+﻿# ThroneEra — Codex production handoff
 
 ## Read this first
 
@@ -18,7 +18,7 @@ Ship a mobile-first paid-traffic MVP that can validate whether Facebook/Instagra
 
 ## Authoritative commercial rule
 
-`$5.99` is a one-time payment for **the current run only**.
+`$4.99` is a one-time payment for **the current run only**.
 
 - Refreshing or restoring the same paid run must never charge again.
 - Starting a new run is free through its prologue.

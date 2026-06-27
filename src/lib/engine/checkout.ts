@@ -6,7 +6,7 @@ import type { CreemCheckoutProvider } from "@/lib/adapters/creem";
 import type { RunStore } from "@/lib/adapters/store";
 import { appendRunFunnelEvent } from "@/lib/analytics";
 import { getSimulatorConfig } from "@/lib/simulators";
-import type { OrderRecord, RunRecord } from "@/lib/types";
+import type { OfferSku, OrderRecord, RunRecord, SimulatorOffer } from "@/lib/types";
 import { getRunVariantId, runVariantPayload } from "@/lib/variants";
 
 type Clock = () => Date;
@@ -17,11 +17,18 @@ interface CheckoutOptions {
   runId: string;
   requestId: string;
   providerProductId: string;
+  offer?: CheckoutOffer;
   allowMockCheckout: boolean;
   siteUrl?: string;
   checkoutProvider?: CreemCheckoutProvider;
   trackCheckoutStarted?: boolean;
   now?: Clock;
+}
+
+interface CheckoutOffer {
+  sku: OfferSku;
+  amountMinor: number;
+  currency: SimulatorOffer["currency"];
 }
 
 interface CompletedWebhookOptions {
@@ -57,7 +64,7 @@ export async function createCheckoutForRun(options: CheckoutOptions): Promise<Ch
     throw new Error(`Run is not ready for checkout: ${run.status}`);
   }
 
-  const offer = getSimulatorConfig(run.simulator, getRunVariantId(run)).offer;
+  const offer = options.offer ?? getSimulatorConfig(run.simulator, getRunVariantId(run)).offer;
   const existing = await options.store.findOpenOrder(run.id, offer.sku);
   if (existing) {
     await appendRunFunnelEvent(options.store, run, trackCheckoutStarted ? "checkout_started" : "checkout_prefetched", {

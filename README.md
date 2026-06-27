@@ -42,6 +42,7 @@ NEXT_PUBLIC_SITE_URL=
 CREEM_API_KEY=
 CREEM_WEBHOOK_SECRET=
 CREEM_COMPLETE_CAMPAIGN_PRODUCT_ID=
+CREEM_UNLIMITED_PRODUCT_ID=
 CREEM_API_BASE_URL=
 SUPABASE_URL=
 SUPABASE_ANON_KEY=
@@ -67,8 +68,9 @@ Production must not enable `THRONEERA_ALLOW_MOCK_CHECKOUT`.
 - Production storage uses Supabase when `SUPABASE_URL` and
   `SUPABASE_SERVICE_ROLE_KEY` are configured.
 
-The base SKU is `complete_current_campaign` at `$5.99`, scoped to one run.
-Replay and cross-sell create new runs without carrying paid entitlement.
+The base SKU is `complete_current_campaign` at `$4.99`, scoped to one run.
+`engine_v3_unlimited` is the `$14.99` permanent dynasty unlock. Replay and
+cross-sell create new runs without carrying one-run paid entitlement.
 
 ## Database
 

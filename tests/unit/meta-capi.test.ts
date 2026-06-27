@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+﻿import { describe, expect, it, vi } from "vitest";
 import { createMetaCapiClient } from "@/lib/adapters/meta-capi";
 
 describe("Meta CAPI adapter", () => {
@@ -25,7 +25,7 @@ describe("Meta CAPI adapter", () => {
             },
             custom_data: {
               currency: "USD",
-              value: 5.99,
+              value: 4.99,
               order_id: "provider-order-1",
               content_ids: ["complete_current_campaign"],
               content_type: "product",
@@ -54,7 +54,7 @@ describe("Meta CAPI adapter", () => {
         eventId: "order-request-1",
         sourceUrl: "https://throneera.com/queen/return?runId=run-1",
         orderId: "provider-order-1",
-        value: 5.99,
+        value: 4.99,
         currency: "USD",
         sku: "complete_current_campaign",
         variantId: "crown",
@@ -82,7 +82,7 @@ describe("Meta CAPI adapter", () => {
         eventId: "order-request-1",
         sourceUrl: "https://throneera.com/queen/return?runId=run-1",
         orderId: "provider-order-1",
-        value: 5.99,
+        value: 4.99,
         currency: "USD",
         sku: "complete_current_campaign",
       }),

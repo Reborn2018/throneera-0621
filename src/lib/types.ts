@@ -17,6 +17,8 @@ export type RealmKey = "legitimacy" | "treasury" | "military" | "publicSupport";
 
 export type RealmState = Record<RealmKey, number>;
 
+export type OfferSku = "complete_current_campaign" | "engine_v3_unlimited";
+
 export interface IdentityOption {
   id: string;
   label: string;
@@ -51,7 +53,7 @@ export interface StoryScene {
 }
 
 export interface SimulatorOffer {
-  sku: "complete_current_campaign";
+  sku: Extract<OfferSku, "complete_current_campaign">;
   amountMinor: number;
   currency: "USD";
   label: string;
@@ -132,7 +134,7 @@ export interface RunRecord {
 export interface OrderRecord {
   id: string;
   runId: string;
-  sku: SimulatorOffer["sku"];
+  sku: OfferSku;
   amountMinor: number;
   currency: SimulatorOffer["currency"];
   status: "pending" | "completed" | "refunded" | "disputed" | "failed" | "expired";

@@ -108,6 +108,16 @@ describe("memory store", () => {
     });
   });
 
+  it("does not treat completed orders as open checkout sessions", async () => {
+    const store = createMemoryStore();
+    await store.saveOrder({
+      ...makeOrder("order-1", "run-1"),
+      status: "completed",
+    });
+
+    expect(await store.findOpenOrder("run-1", "complete_current_campaign")).toBeNull();
+  });
+
   it("stores active entitlements by run", async () => {
     const store = createMemoryStore();
 

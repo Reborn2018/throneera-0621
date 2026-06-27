@@ -1,4 +1,4 @@
-import { createHmac } from "node:crypto";
+﻿import { createHmac } from "node:crypto";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
@@ -41,7 +41,7 @@ describe("Creem webhook route", () => {
       runId: "run-1",
       requestId: "order-request-1",
       providerOrderId: "ord_123",
-      amountMinor: 599,
+      amountMinor: 499,
       currency: "USD",
       sku: "complete_current_campaign",
     });
@@ -56,7 +56,7 @@ describe("Creem webhook route", () => {
         order: {
           id: "ord_123",
           product: "prod_123",
-          amount: 599,
+          amount: 499,
           currency: "USD",
           status: "paid",
         },
@@ -82,7 +82,7 @@ describe("Creem webhook route", () => {
       providerCheckoutId: "ch_123",
       providerOrderId: "ord_123",
       providerProductId: "prod_123",
-      amountMinor: 599,
+      amountMinor: 499,
       currency: "USD",
     });
     expect(mocks.createMetaCapiClient).toHaveBeenCalledWith({
@@ -94,7 +94,7 @@ describe("Creem webhook route", () => {
       eventId: "order-request-1",
       sourceUrl: "https://throneera.com/queen/return?runId=run-1&variant=legacy",
       orderId: "ord_123",
-      value: 5.99,
+      value: 4.99,
       currency: "USD",
       sku: "complete_current_campaign",
       variantId: "legacy",

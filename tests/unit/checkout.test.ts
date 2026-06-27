@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+﻿import { describe, expect, it, vi } from "vitest";
 import { createMemoryStore } from "@/lib/adapters/local-store";
 import {
   applyCheckoutCompleted,
@@ -97,7 +97,7 @@ describe("checkout engine", () => {
       providerCheckoutId: checkout.order.providerCheckoutId,
       providerOrderId: "provider-order-1",
       providerProductId: productId,
-      amountMinor: 599,
+      amountMinor: 499,
       currency: "USD",
       now: fixedNow,
     });
@@ -128,7 +128,7 @@ describe("checkout engine", () => {
         providerCheckoutId: checkout.order.providerCheckoutId,
         providerOrderId: "provider-order-1",
         providerProductId: productId,
-        amountMinor: 599,
+        amountMinor: 499,
         currency: "USD",
         now: fixedNow,
       });
@@ -138,9 +138,9 @@ describe("checkout engine", () => {
   });
 
   it.each([
-    { providerProductId: "wrong-product", amountMinor: 599, currency: "USD" as const },
+    { providerProductId: "wrong-product", amountMinor: 499, currency: "USD" as const },
     { providerProductId: productId, amountMinor: 600, currency: "USD" as const },
-    { providerProductId: productId, amountMinor: 599, currency: "EUR" as const },
+    { providerProductId: productId, amountMinor: 499, currency: "EUR" as const },
   ])("rejects checkout mismatch %#", async (payload) => {
     const store = await createPaywalledRun();
     const checkout = await createCheckoutForRun({
@@ -180,7 +180,7 @@ describe("checkout engine", () => {
       providerCheckoutId: checkout.order.providerCheckoutId,
       providerOrderId: "provider-order-1",
       providerProductId: productId,
-      amountMinor: 599,
+      amountMinor: 499,
       currency: "USD",
       now: fixedNow,
     });
@@ -221,7 +221,7 @@ describe("checkout engine", () => {
       providerCheckoutId: checkout.order.providerCheckoutId,
       providerOrderId: "provider-order-2",
       providerProductId: productId,
-      amountMinor: 599,
+      amountMinor: 499,
       currency: "USD",
       now: fixedNow,
     });
@@ -234,7 +234,7 @@ describe("checkout engine", () => {
             run_type: "replay",
             source_run_id: "run-1",
             order_id: checkout.order.id,
-            amount_minor: 599,
+            amount_minor: 499,
           }),
         }),
       ]),
@@ -257,7 +257,7 @@ describe("checkout engine", () => {
       providerCheckoutId: checkout.order.providerCheckoutId,
       providerOrderId: "provider-order-1",
       providerProductId: productId,
-      amountMinor: 599,
+      amountMinor: 499,
       currency: "USD",
       now: fixedNow,
     });

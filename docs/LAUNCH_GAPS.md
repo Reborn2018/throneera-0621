@@ -1,4 +1,4 @@
-# Launch Gaps
+﻿# Launch Gaps
 
 This branch creates a runnable production skeleton and local verification path. It
 does not claim external provider launch readiness without credentials and dashboard
@@ -33,7 +33,7 @@ access.
 ## Production Safety Rules
 
 - Do not enable mock checkout in production.
-- Do not describe `$5.99` as lifetime access.
+- Do not describe `$4.99` as lifetime access.
 - Do not sell bundle, collection, subscription, credit pack, or future content
   until real inventory exists behind the feature flag.
 - Do not expose Meta access tokens or payment secrets to client code.

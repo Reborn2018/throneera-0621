@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+﻿import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   sendPurchase: vi.fn(),
@@ -73,7 +73,7 @@ describe("Creem return sync", () => {
         order: {
           id: "ord_123",
           product: productId,
-          amount: 599,
+          amount: 499,
           currency: "USD",
         },
       }),
@@ -110,7 +110,7 @@ describe("Creem return sync", () => {
         order: {
           id: "ord_123",
           product: productId,
-          amount: 599,
+          amount: 499,
           currency: "USD",
         },
       }),
@@ -134,7 +134,7 @@ describe("Creem return sync", () => {
       eventId: "request-1",
       sourceUrl: "https://throneera.com/queen/return?runId=run-1&variant=legacy",
       orderId: "ord_123",
-      value: 5.99,
+      value: 4.99,
       currency: "USD",
       sku: "complete_current_campaign",
       variantId: "legacy",
@@ -154,7 +154,7 @@ describe("Creem return sync", () => {
         order: {
           id: "ord_123",
           product: productId,
-          amount: 599,
+          amount: 499,
           currency: "USD",
         },
       }),

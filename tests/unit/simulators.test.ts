@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+﻿import { describe, expect, it } from "vitest";
 import { getSimulatorConfig, simulatorConfigs } from "@/lib/simulators";
 
 describe("simulator configs", () => {
@@ -37,7 +37,7 @@ describe("simulator configs", () => {
       expect(config.paidScenes.filter((scene) => scene.anchor)).toHaveLength(2);
       expect(config.endings.totalSlots).toBeGreaterThanOrEqual(5);
       expect(config.offer.sku).toBe("complete_current_campaign");
-      expect(config.offer.amountMinor).toBe(599);
+      expect(config.offer.amountMinor).toBe(499);
       expect(config.offer.currency).toBe("USD");
     },
   );

@@ -1,10 +1,10 @@
 import type {
   EntitlementRecord,
+  OfferSku,
   OrderRecord,
   RestoreTokenRecord,
   RunEventRecord,
   RunRecord,
-  SimulatorOffer,
   WebhookEventRecord,
 } from "@/lib/types";
 
@@ -20,7 +20,7 @@ export interface RunStore {
   findOrderByProviderCheckoutId(providerCheckoutId: string): Promise<OrderRecord | null>;
   findOrderByProviderOrderId(providerOrderId: string): Promise<OrderRecord | null>;
   updateOrder(id: string, update: (order: OrderRecord) => OrderRecord): Promise<OrderRecord>;
-  findOpenOrder(runId: string, sku: SimulatorOffer["sku"]): Promise<OrderRecord | null>;
+  findOpenOrder(runId: string, sku: OfferSku): Promise<OrderRecord | null>;
   saveEntitlement(entitlement: EntitlementRecord): Promise<void>;
   updateEntitlement(
     id: string,

@@ -1,4 +1,4 @@
-# Provider Launch Implementation Plan
+﻿# Provider Launch Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -71,6 +71,6 @@
 - Local mock checkout still passes.
 - Production checkout fails closed unless Creem/Supabase env vars are configured.
 - Real Creem webhook signature is required before paid entitlement is granted.
-- Purchase events include `event_name=Purchase`, `event_id`, `currency=USD`, and value `5.99`.
+- Purchase events include `event_name=Purchase`, `event_id`, `currency=USD`, and value `4.99`.
 - Supabase service-role store can persist runs, orders, entitlements, restore tokens, events, and webhook receipts.
 - Vercel production has no mock checkout env flag.

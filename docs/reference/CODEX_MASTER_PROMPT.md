@@ -1,4 +1,4 @@
-# Codex master implementation prompt — ThroneEra MVP
+﻿# Codex master implementation prompt — ThroneEra MVP
 
 You are the lead product engineer for a paid-traffic interactive narrative product. Build and deploy a production-ready MVP from this handoff package.
 
@@ -47,7 +47,7 @@ Do not claim the existing static prototype is production-ready. Reimplement it w
 
 ## Payment semantics
 
-The base SKU is `complete_current_campaign`, nominally `$5.99`.
+The base SKU is `complete_current_campaign`, nominally `$4.99`.
 
 Entitlement key: `run_id`, not user, browser, simulator, or account.
 

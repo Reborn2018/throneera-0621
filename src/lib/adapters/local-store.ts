@@ -3,11 +3,11 @@ import { dirname } from "node:path";
 import type { RunStore, StoreSnapshot } from "@/lib/adapters/store";
 import type {
   EntitlementRecord,
+  OfferSku,
   OrderRecord,
   RestoreTokenRecord,
   RunEventRecord,
   RunRecord,
-  SimulatorOffer,
   WebhookEventRecord,
 } from "@/lib/types";
 
@@ -119,13 +119,13 @@ class LocalStore implements RunStore {
 
   async findOpenOrder(
     runId: string,
-    sku: SimulatorOffer["sku"],
+    sku: OfferSku,
   ): Promise<OrderRecord | null> {
     const order = this.snapshot.orders.find(
       (candidate) =>
         candidate.runId === runId &&
         candidate.sku === sku &&
-        (candidate.status === "pending" || candidate.status === "completed"),
+        candidate.status === "pending",
     );
 
     return order ? clone(order) : null;

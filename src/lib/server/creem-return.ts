@@ -3,7 +3,7 @@ import type { RunStore } from "@/lib/adapters/store";
 import { applyCheckoutCompleted } from "@/lib/engine/checkout";
 import { sendMetaPurchaseIfConfigured } from "@/lib/server/meta-purchase";
 import { getSimulatorConfig } from "@/lib/simulators";
-import type { RunRecord } from "@/lib/types";
+import type { OfferSku, RunRecord } from "@/lib/types";
 import { getRunVariantId } from "@/lib/variants";
 
 interface CreemReturnOptions {
@@ -13,6 +13,7 @@ interface CreemReturnOptions {
   apiBaseUrl?: string;
   fetchImpl?: typeof fetch;
   requestOrigin?: string;
+  offerSku?: OfferSku;
 }
 
 export async function syncCreemReturnEntitlement(
@@ -22,8 +23,9 @@ export async function syncCreemReturnEntitlement(
     return options.run;
   }
 
-  const offer = getSimulatorConfig(options.run.simulator, getRunVariantId(options.run)).offer;
-  const order = await options.store.findOpenOrder(options.run.id, offer.sku);
+  const offerSku =
+    options.offerSku ?? getSimulatorConfig(options.run.simulator, getRunVariantId(options.run)).offer.sku;
+  const order = await options.store.findOpenOrder(options.run.id, offerSku);
   if (!order || order.provider !== "creem") {
     return options.run;
   }

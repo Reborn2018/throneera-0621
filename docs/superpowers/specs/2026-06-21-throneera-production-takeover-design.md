@@ -1,4 +1,4 @@
-# ThroneEra Production Takeover Design
+﻿# ThroneEra Production Takeover Design
 
 Date: 2026-06-21
 
@@ -30,7 +30,7 @@ In scope for this takeover pass:
 - Build the real application structure and make it runnable.
 - Preserve the Queen conversion flow: landing, identity, prologue, personalized echo, crisis, paywall, return, paid scenes, ending, share/replay/cross-sell entry points.
 - Add a production-complete Napoleon flow with equivalent route depth and the same commercial semantics.
-- Keep `$5.99` as a one-time purchase for the current run only.
+- Keep `$4.99` as a one-time purchase for the current run only.
 - Ensure same-run restore never charges again and replay creates a separate unpaid run.
 - Add legal/support pages and environment documentation.
 - Add automated verification gates that can run without external provider accounts.
@@ -88,7 +88,7 @@ During local development, a file-backed adapter preserves these semantics. Supab
 
 ## Payment Semantics
 
-The base SKU is `complete_current_campaign` at 599 cents USD. The entitlement key is `run_id`.
+The base SKU is `complete_current_campaign` at 499 cents USD. The entitlement key is `run_id`.
 
 - A verified completed webhook grants exactly one run.
 - Returning, refreshing, or restoring that same run does not charge again.

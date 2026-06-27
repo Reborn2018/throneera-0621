@@ -2,11 +2,11 @@ import { createClient } from "@supabase/supabase-js";
 import type { RunStore } from "@/lib/adapters/store";
 import type {
   EntitlementRecord,
+  OfferSku,
   OrderRecord,
   RestoreTokenRecord,
   RunEventRecord,
   RunRecord,
-  SimulatorOffer,
   WebhookEventRecord,
 } from "@/lib/types";
 
@@ -134,7 +134,7 @@ class SupabaseStore implements RunStore {
 
   async findOpenOrder(
     runId: string,
-    sku: SimulatorOffer["sku"],
+    sku: OfferSku,
   ): Promise<OrderRecord | null> {
     const row = await this.maybeOne(
       this.client
@@ -142,7 +142,7 @@ class SupabaseStore implements RunStore {
         .select("*")
         .eq("run_id", runId)
         .eq("sku", sku)
-        .in("status", ["pending", "completed"])
+        .eq("status", "pending")
         .maybeSingle(),
     );
     return row ? orderFromSupabaseRow(row) : null;
