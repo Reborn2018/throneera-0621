@@ -398,6 +398,25 @@ body{background:#0a0a0c;font-family:'EB Garamond',Georgia,serif;color:#fff;-webk
 .pw-trust{display:flex;justify-content:center;gap:16px;margin:16px 0 6px;flex-wrap:wrap}
 .pw-trust span{display:flex;align-items:center;gap:6px;font-family:'Barlow Condensed',sans-serif;font-size:11.5px;letter-spacing:1px;text-transform:uppercase;color:var(--ink-dim)}
 .pw-trust svg{opacity:.8}
+/* Scoped overrides protect the redesign from the legacy global paywall styles. */
+.te-live .pw-price-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px 18px;text-align:center;overflow:hidden}
+.te-live .pw-price-card>*{position:relative;z-index:1}
+.te-live .pw-price{display:block;margin:0;font-size:52px;line-height:.95;letter-spacing:0;white-space:nowrap;font-variant-numeric:lining-nums;color:var(--gold)}
+.te-live .theme-napoleon .pw-price{font-size:46px}
+.te-live .pw-price-note{display:block;max-width:260px;margin:0 auto;font-size:12px;line-height:1.35;letter-spacing:1.8px;color:var(--ink-dim);text-align:center}
+.te-live .pw-trust{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;width:100%;margin:0}
+.te-live .pw-trust .pw-trust-item{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;font-size:11.5px;line-height:1.25;letter-spacing:1.2px;text-align:center;white-space:normal;color:var(--ink-dim)}
+.te-live .pw-trust .pw-trust-icon{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:auto;color:var(--gold)}
+.te-live .pw-trust .pw-trust-label{display:inline;width:auto;color:var(--ink-dim);font-family:'Barlow Condensed',sans-serif;font-size:11.5px;font-weight:700;letter-spacing:1.2px;line-height:1.25;text-transform:uppercase}
+.te-live .pw-trust svg{display:block;flex:0 0 auto}
+@media(max-width:420px){
+  .te-live .pw-price-card{padding:22px 14px}
+  .te-live .pw-price{font-size:46px}
+  .te-live .theme-napoleon .pw-price{font-size:40px}
+  .te-live .pw-price-note{max-width:210px;font-size:11px;letter-spacing:1.5px}
+  .te-live .pw-trust .pw-trust-item{font-size:10.8px;letter-spacing:1px}
+  .te-live .pw-trust .pw-trust-label{font-size:10.8px;letter-spacing:1px}
+}
 /* ===== tiered offer (AOV ladder) ===== */
 .tiers{display:flex;flex-direction:column;gap:11px;margin-bottom:16px}
 .tier{position:relative;display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;padding:15px 15px 14px;background:var(--surface);border:1.5px solid var(--line);border-radius:13px;cursor:pointer;transition:.2s;color:var(--ink)}

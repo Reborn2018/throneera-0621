@@ -59,7 +59,6 @@ function Landing({ d, onStart }) {
       <div className="land-support">
         <div className="land-trust">{L.trust.map(function(t,i){return <span key={i}>{t}</span>;})}</div>
         <p className="land-body">{L.body}</p>
-        <button className="btn btn-primary cta-bottom" onClick={onStart}>{L.cta}</button>
         <Legal />
       </div>
     </div>
@@ -558,7 +557,12 @@ function Paywall({ d, run, onUnlock, onLater }) {
           <div className="pw-price-note">{W.priceNote}</div>
           <div className="pw-trust">
             {W.trust.map(function(t,i){
-              return <span key={i}><span style={{color:'var(--gold)'}}>{trustIcons[i]}</span>{t}</span>;
+              return (
+                <span className="pw-trust-item" key={i}>
+                  <span className="pw-trust-icon">{trustIcons[i]}</span>
+                  <span className="pw-trust-label">{t}</span>
+                </span>
+              );
             })}
           </div>
         </div>
